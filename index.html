@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nyte Fyre — World of Warcraft guild recruitment</title>
+    <title>WoW Forever — World of Warcraft guild recruitment</title>
     <meta
       name="description"
-      content="Nyte Fyre is a World of Warcraft guild recruiting reliable raiders. Replace realm, faction, and Discord placeholders with your live details."
+      content="WoW Forever guild recruitment. Edit js/config.js to set realm, Discord, raid nights, and officers."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,7 +22,7 @@
       <div class="wrap header-inner">
         <a class="brand" href="#top">
           <span class="brand-mark" aria-hidden="true">✦</span>
-          <span class="brand-name">Nyte Fyre</span>
+          <span class="brand-name" data-bind="name">WoW Forever</span>
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
           Menu
@@ -40,20 +40,19 @@
     <main id="top">
       <section class="hero">
         <div class="wrap">
-          <p class="kicker">World of Warcraft · Retail</p>
-          <h1>Nyte Fyre</h1>
-          <p class="lede">
-            A focused raid team that still leaves room to be human. We clear current content,
-            keep voice civil, and recruit people who show up prepared.
+          <p class="kicker" data-bind="game">World of Warcraft · Retail</p>
+          <h1 data-bind="name">WoW Forever</h1>
+          <p class="lede" data-bind="tagline">
+            A focused raid team that still leaves room to be human.
           </p>
           <div class="meta-row">
-            <span class="chip">Realm: [PLACEHOLDER]</span>
-            <span class="chip">Faction: [PLACEHOLDER]</span>
-            <span class="chip">Goal: AOTC · [optional Mythic]</span>
+            <span class="chip" data-bind="realm">Realm: Your realm</span>
+            <span class="chip" data-bind="faction">Faction: Horde or Alliance</span>
+            <span class="chip" data-bind="goal">Goal: AOTC</span>
           </div>
           <div class="actions">
             <a class="btn btn-gold" href="#apply">Apply to raid</a>
-            <a class="btn btn-ghost" href="https://discord.gg/PLACEHOLDER" rel="noopener noreferrer">
+            <a class="btn btn-ghost" data-bind-href="discord" href="https://discord.gg/YOURCODE" rel="noopener noreferrer">
               Join Discord
             </a>
           </div>
@@ -65,22 +64,13 @@
           <div>
             <p class="kicker">Who we are</p>
             <h2>Raid nights that start on time.</h2>
-            <p>
-              Nyte Fyre is built for players who want a stable team without a second job. We
-              expect logs, food, and a working mic — not 20 hours of split keys every week.
-            </p>
-            <p class="muted">
-              Replace this copy with your guild’s real tone: social-first, AOTC farm, or
-              Cutting Edge push.
+            <p data-bind="about">
+              Edit js/config.js to replace this about text.
             </p>
           </div>
           <article class="panel">
             <h3>What we value</h3>
-            <ul>
-              <li>On time, every raid. Late means you tell an officer.</li>
-              <li>Notes read before pull. Wipes happen; repeating them should not.</li>
-              <li>No toxicity in Discord or trade chat representing the guild.</li>
-            </ul>
+            <ul data-bind-list="values"></ul>
           </article>
         </div>
       </section>
@@ -90,18 +80,17 @@
           <article class="panel">
             <p class="kicker">Calendar</p>
             <h2>Schedule</h2>
-            <p><strong>Raid days:</strong> [Tue / Thu — PLACEHOLDER]</p>
-            <p><strong>Invite / pull:</strong> [7:30 / 8:00 PM server — PLACEHOLDER]</p>
-            <p><strong>Length:</strong> [3 hours]</p>
-            <p class="muted">Times are server time until you lock a region and realm.</p>
+            <p><strong>Raid days:</strong> <span data-bind="raidDays"></span></p>
+            <p><strong>Invite:</strong> <span data-bind="inviteTime"></span></p>
+            <p><strong>Pull:</strong> <span data-bind="pullTime"></span></p>
+            <p><strong>Length:</strong> <span data-bind="raidLength"></span></p>
           </article>
           <article class="panel">
             <p class="kicker">Current tier</p>
             <h2>Progression</h2>
-            <p><strong>Raid:</strong> [Current raid name]</p>
-            <p><strong>Heroic:</strong> [x/x]</p>
-            <p><strong>Mythic:</strong> [x/x or n/a]</p>
-            <p class="muted">Update these numbers after each lockout.</p>
+            <p><strong>Raid:</strong> <span data-bind="currentRaid"></span></p>
+            <p><strong>Heroic:</strong> <span data-bind="heroicProgress"></span></p>
+            <p><strong>Mythic:</strong> <span data-bind="mythicProgress"></span></p>
           </article>
         </div>
       </section>
@@ -110,13 +99,8 @@
         <div class="wrap">
           <p class="kicker">Roster</p>
           <h2>What we are recruiting</h2>
-          <p class="muted">Mark roles open or closed as your bench fills.</p>
-          <ul class="need-list">
-            <li><span>Tank</span> <span class="tag-closed">Closed</span></li>
-            <li><span>Healer</span> <span class="tag-open">Open</span></li>
-            <li><span>Melee DPS</span> <span class="tag-open">Open</span></li>
-            <li><span>Ranged DPS</span> <span class="tag-open">Open</span></li>
-          </ul>
+          <p class="muted">Toggle open/closed in js/config.js.</p>
+          <ul class="need-list" data-bind-list="recruitment"></ul>
         </div>
       </section>
 
@@ -126,18 +110,17 @@
             <p class="kicker">Join</p>
             <h2>Apply</h2>
             <p>
-              Fastest path: hop in Discord and post in the recruitment channel. The form below
+              Fastest path: hop in Discord and post in the recruitment channel. The form
               opens your mail client with a filled message for officers.
             </p>
             <p>
-              <a class="btn btn-ghost" href="https://discord.gg/PLACEHOLDER" rel="noopener noreferrer">
+              <a class="btn btn-ghost" data-bind-href="discord" href="https://discord.gg/YOURCODE" rel="noopener noreferrer">
                 Discord invite
               </a>
             </p>
             <p class="form-note">
-              Static GitHub Pages cannot send mail by itself. Replace
-              <code>REPLACE_WITH_OFFICER_EMAIL</code> in <code>js/main.js</code> and the Discord
-              links above before you share this page widely.
+              Set <code>discordInvite</code> and <code>officerEmail</code> in
+              <code>js/config.js</code>. GitHub Pages cannot send email by itself.
             </p>
           </div>
           <form class="panel" id="apply-form">
@@ -176,30 +159,18 @@
         <div class="wrap">
           <p class="kicker">Leadership</p>
           <h2>Officers</h2>
-          <div class="grid-3">
-            <article class="officer">
-              <h3>[GM name]</h3>
-              <p class="muted">Guild Master</p>
-            </article>
-            <article class="officer">
-              <h3>[Raid lead]</h3>
-              <p class="muted">Raid Lead</p>
-            </article>
-            <article class="officer">
-              <h3>[Recruiter]</h3>
-              <p class="muted">Recruitment</p>
-            </article>
-          </div>
+          <div class="grid-3" data-bind-list="officers"></div>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
       <div class="wrap footer-inner">
-        <span>© 2026 Nyte Fyre. Fan site — not affiliated with Blizzard Entertainment.</span>
-        <a href="https://github.com/nyte-fyre/nyte-fyre-guild">Source on GitHub</a>
+        <span data-bind="footer"></span>
+        <a data-bind-href="github" href="https://github.com/Nyte-fyre/Placeholder">Source on GitHub</a>
       </div>
     </footer>
+    <script src="js/config.js"></script>
     <script src="js/main.js"></script>
   </body>
 </html>

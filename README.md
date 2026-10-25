@@ -1,15 +1,12 @@
-# Nyte Fyre
+# WoW Forever
 
-Static World of Warcraft guild recruitment site, published with GitHub Pages.
+Static World of Warcraft guild recruitment site for [Nyte-fyre/Placeholder](https://github.com/Nyte-fyre/Placeholder).
 
-**Live URL:** https://nyte-fyre.github.io/nyte-fyre-guild/
+**Live URL (after Pages is on):** https://nyte-fyre.github.io/Placeholder/
 
-## Edit before you share it
+## Fill in your guild
 
-- Realm, faction, raid nights, and progression in `index.html`
-- Discord invite links (`https://discord.gg/PLACEHOLDER`)
-- Officer names
-- Officer email in `js/main.js` (`REPLACE_WITH_OFFICER_EMAIL`)
+Edit [`js/config.js`](js/config.js) — guild name, realm, faction, raid nights, Discord invite, officer email, roster, and officers. Then commit and push. You do not need to edit `index.html` for those fields.
 
 ## Local preview
 
@@ -21,6 +18,6 @@ python -m http.server 8080
 
 Then visit http://localhost:8080/
 
-## Pages
+## GitHub Pages
 
-The site is static HTML/CSS/JS on branch `main`, served from `/` (repo root).
+Pushes to `main` run a GitHub Action that publishes the repo root. First deploy can take a minute.
