@@ -8,7 +8,7 @@ Static World of Warcraft guild recruitment site for [Nyte-fyre/Placeholder](http
 
 Edit [`js/config.js`](js/config.js) — guild name, realm, raid teams and times (Eastern), values, rules, loot, recruitment, officers, Discord invite, and the apply-form webhook. Then commit and push. You do not need to edit `index.html` for those fields.
 
-The apply form posts to a Discord webhook set in `applyWebhook`. While it is empty, the form is disabled and points people to #apply-here. The webhook URL is visible to anyone who reads the page source, so point it at an officer-only channel and replace it if it gets abused.
+The apply form posts to the guild bot Worker set in `applyEndpoint` (a separate project, which also runs the Discord `/apply` command). The Worker holds the Discord webhook as a secret and posts the application. While `applyEndpoint` is empty, the form is disabled and points people to #apply-here.
 
 ## Local preview
 

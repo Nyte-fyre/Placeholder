@@ -9,9 +9,9 @@ window.GUILD = {
     "Organized PvE progression, steady improvement, and a strong community. We take our raids seriously — and real life always comes first.",
   status: "Leveling for launch. Raids open December 9.",
   discordInvite: "https://discord.gg/bhQgUXudZ",
-  // Discord webhook for the apply form (Server Settings > Integrations > Webhooks).
-  // Anyone can read this URL from the page; point it at an officer-only channel.
-  applyWebhook: "",
+  // Guild bot Worker that receives the apply form, e.g. https://guild-bot.<you>.workers.dev/apply
+  // (see Websites\GuildBot). The Discord webhook stays secret inside the Worker.
+  applyEndpoint: "https://guild-bot.nytefyre.workers.dev/apply",
   githubRepo: "https://github.com/Nyte-fyre/Placeholder",
   year: "2026",
 

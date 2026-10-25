@@ -159,11 +159,6 @@ if (toggle && nav) {
 const COOLDOWN_KEY = "applySentAt";
 const COOLDOWN_MS = 10 * 60 * 1000;
 
-function clip(text, max) {
-  const value = String(text || "").trim();
-  return value.length > max ? `${value.slice(0, max - 1)}…` : value || "—";
-}
-
 function readCooldown() {
   try {
     return Number(localStorage.getItem(COOLDOWN_KEY)) || 0;
@@ -188,7 +183,7 @@ if (form) {
     status.className = `form-status ${ok ? "ok" : "err"}`;
   };
 
-  if (!cfg.applyWebhook) {
+  if (!cfg.applyEndpoint) {
     submit.disabled = true;
     say("Applications through the site aren't open yet. Join the Discord and post in #apply-here.", false);
   }
@@ -202,39 +197,22 @@ if (form) {
       return;
     }
 
-    // allowed_mentions stops anything typed in the form from pinging @everyone or roles.
-    const payload = {
-      username: `${cfg.name} applications`,
-      allowed_mentions: { parse: [] },
-      embeds: [
-        {
-          title: clip(`New application: ${data.get("character")}`, 256),
-          color: 0xd4a54a,
-          timestamp: new Date().toISOString(),
-          fields: [
-            ["Discord", data.get("discord")],
-            ["Character", data.get("character")],
-            ["Class / spec", data.get("spec")],
-            ["Role", data.get("role")],
-            ["Raid team", data.get("team")],
-            ["Interests", data.getAll("interests").join(", ")],
-            ["Experience", data.get("experience")],
-            ["Availability", data.get("availability")],
-            ["Warcraft Logs", data.get("logs")],
-            ["Fun fact", data.get("note")],
-          ].map(([name, value]) => ({ name, value: clip(value, 1024), inline: name !== "Fun fact" })),
-        },
-      ],
-    };
+    // The guild bot Worker builds the Discord message, so no webhook URL lives in this page.
+    const payload = Object.fromEntries(data);
+    payload.interests = data.getAll("interests");
 
     submit.disabled = true;
     say("Sending…", true);
     try {
-      const res = await fetch(cfg.applyWebhook, {
+      const res = await fetch(cfg.applyEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (res.status === 429) {
+        say("Too many applications at once. Please wait a minute and try again.", false);
+        return;
+      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       writeCooldown();
       form.reset();
