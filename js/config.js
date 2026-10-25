@@ -8,7 +8,7 @@ window.GUILD = {
   tagline:
     "Organized PvE progression, steady improvement, and a strong community. We take our raids seriously — and real life always comes first.",
   status: "Leveling for launch. Raids open December 9.",
-  discordInvite: "https://discord.gg/MZcGcPmTNY",
+  discordInvite: "https://discord.gg/d249H3sCyD",
   // Guild bot Worker that receives the apply form, e.g. https://guild-bot.<you>.workers.dev/apply
   // (see Websites\GuildBot). The Discord webhook stays secret inside the Worker.
   applyEndpoint: "https://guild-bot.nytefyre.workers.dev/apply",
