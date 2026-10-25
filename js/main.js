@@ -206,8 +206,11 @@ function applyRaids(raids) {
       ...raids.slice(0, 8).map((raid) => {
         const li = el("li", "raid-item");
         const info = el("div", "raid-info");
-        info.append(el("strong", "", raid.title), el("span", "raid-when", raidWhen(raid.start)));
-        const meta = [raid.leader && `Led by ${raid.leader}`, `${raid.signups} signed up`].filter(Boolean).join(" · ");
+        info.append(el("strong", "", raid.title));
+        if (raid.subtitle) info.append(el("span", "raid-subtitle", raid.subtitle));
+        info.append(el("span", "raid-when", raidWhen(raid.start)));
+        const count = `${raid.signups} signed up${raid.tentative ? ` (+${raid.tentative} tentative)` : ""}`;
+        const meta = [raid.leader && `Led by ${raid.leader}`, count].filter(Boolean).join(" · ");
         info.append(el("span", "muted raid-meta", meta));
         const actions = el("div", "raid-actions");
         const signup = el("a", "btn btn-ghost btn-small", "Sign up on Discord");
@@ -242,7 +245,7 @@ if (cfg.botUrl) {
     .catch(() => {});
   fetch(new URL("/raids", cfg.botUrl))
     .then((r) => (r.ok ? r.json() : null))
-    .then((data) => data && !data.error && applyRaids(data.raids || []))
+    .then((data) => data && applyRaids(data.raids || []))
     .catch(() => {});
 }
 

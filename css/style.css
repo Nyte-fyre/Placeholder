@@ -561,6 +561,11 @@ textarea {
   gap: 0.2rem;
 }
 
+.raid-subtitle {
+  color: var(--steel);
+  font-size: 0.95rem;
+}
+
 .raid-when {
   color: var(--accent-text);
 }
