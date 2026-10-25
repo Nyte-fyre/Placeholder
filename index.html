@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>WoW Forever — World of Warcraft guild recruitment</title>
+    <title>Horde guild recruitment — WoW Forever</title>
     <meta
       name="description"
-      content="WoW Forever guild recruitment. Edit js/config.js to set realm, Discord, raid nights, and officers."
+      content="Horde PvE progression guild on WoW Forever. Organized raiding, Loot Council, and a strong community."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,17 +22,20 @@
       <div class="wrap header-inner">
         <a class="brand" href="#top">
           <span class="brand-mark" aria-hidden="true">✦</span>
-          <span class="brand-name" data-bind="name">WoW Forever</span>
+          <span class="brand-name" data-bind="name">&lt;Placeholder&gt;</span>
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
           Menu
         </button>
         <nav class="nav" id="site-nav">
           <a href="#about">About</a>
-          <a href="#schedule">Schedule</a>
+          <a href="#values">Values</a>
+          <a href="#rules">Rules</a>
+          <a href="#raids">Raids</a>
+          <a href="#loot">Loot</a>
           <a href="#recruitment">Recruitment</a>
           <a href="#apply">Apply</a>
-          <a href="#officers">Officers</a>
+          <a href="#officers">Leadership</a>
         </nav>
       </div>
     </header>
@@ -40,16 +43,11 @@
     <main id="top">
       <section class="hero">
         <div class="wrap">
-          <p class="kicker" data-bind="game">World of Warcraft · Retail</p>
-          <h1 data-bind="name">WoW Forever</h1>
-          <p class="lede" data-bind="tagline">
-            A focused raid team that still leaves room to be human.
-          </p>
-          <div class="meta-row">
-            <span class="chip" data-bind="realm">Realm: Your realm</span>
-            <span class="chip" data-bind="faction">Faction: Horde or Alliance</span>
-            <span class="chip" data-bind="goal">Goal: AOTC</span>
-          </div>
+          <p class="kicker" data-bind="kicker">WoW Forever · Horde</p>
+          <h1 data-bind="name">&lt;Placeholder&gt;</h1>
+          <p class="lede" data-bind="tagline"></p>
+          <div class="meta-row" data-bind-list="chips"></div>
+          <p class="status" data-bind="status"></p>
           <div class="actions">
             <a class="btn btn-gold" href="#apply">Apply to raid</a>
             <a class="btn btn-ghost" data-bind-href="discord" href="https://discord.gg/YOURCODE" rel="noopener noreferrer">
@@ -63,35 +61,57 @@
         <div class="wrap grid-2">
           <div>
             <p class="kicker">Who we are</p>
-            <h2>Raid nights that start on time.</h2>
-            <p data-bind="about">
-              Edit js/config.js to replace this about text.
-            </p>
+            <h2>Raid seriously. Keep it human.</h2>
+            <p data-bind="about"></p>
+            <p class="muted" data-bind="welcome"></p>
           </div>
           <article class="panel">
-            <h3>What we value</h3>
-            <ul data-bind-list="values"></ul>
+            <h3>Our focus</h3>
+            <dl class="focus-list" data-bind-list="focus"></dl>
           </article>
         </div>
       </section>
 
-      <section id="schedule">
+      <section id="values">
+        <div class="wrap">
+          <p class="kicker">Guild values</p>
+          <h2>How we play together</h2>
+          <div class="grid-3" data-bind-list="values"></div>
+        </div>
+      </section>
+
+      <section id="rules">
         <div class="wrap grid-2">
+          <div>
+            <p class="kicker">Guild rules</p>
+            <h2>The ground rules</h2>
+            <ol class="rules" data-bind-list="rules"></ol>
+          </div>
           <article class="panel">
-            <p class="kicker">Calendar</p>
-            <h2>Schedule</h2>
-            <p><strong>Raid days:</strong> <span data-bind="raidDays"></span></p>
-            <p><strong>Invite:</strong> <span data-bind="inviteTime"></span></p>
-            <p><strong>Pull:</strong> <span data-bind="pullTime"></span></p>
-            <p><strong>Length:</strong> <span data-bind="raidLength"></span></p>
+            <h3>A few final things</h3>
+            <div data-bind-list="rulesFooter"></div>
           </article>
-          <article class="panel">
-            <p class="kicker">Current tier</p>
-            <h2>Progression</h2>
-            <p><strong>Raid:</strong> <span data-bind="currentRaid"></span></p>
-            <p><strong>Heroic:</strong> <span data-bind="heroicProgress"></span></p>
-            <p><strong>Mythic:</strong> <span data-bind="mythicProgress"></span></p>
-          </article>
+        </div>
+      </section>
+
+      <section id="raids">
+        <div class="wrap">
+          <p class="kicker">Calendar</p>
+          <h2>Raid teams</h2>
+          <p class="muted" data-bind="raidExpectations"></p>
+          <div class="grid-2 even" data-bind-list="raids"></div>
+          <p class="form-note" data-bind="tzNote"></p>
+          <p class="callout" data-bind="questions"></p>
+        </div>
+      </section>
+
+      <section id="loot">
+        <div class="wrap grid-2">
+          <div>
+            <p class="kicker">Loot</p>
+            <h2>Loot Council</h2>
+            <div data-bind-list="loot"></div>
+          </div>
         </div>
       </section>
 
@@ -99,7 +119,6 @@
         <div class="wrap">
           <p class="kicker">Roster</p>
           <h2>What we are recruiting</h2>
-          <p class="muted">Toggle open/closed in js/config.js.</p>
           <ul class="need-list" data-bind-list="recruitment"></ul>
         </div>
       </section>
@@ -110,30 +129,31 @@
             <p class="kicker">Join</p>
             <h2>Apply</h2>
             <p>
-              Fastest path: hop in Discord and post in the recruitment channel. The form
-              opens your mail client with a filled message for officers.
+              We know a lot of you are returning players, so remind us who you are! Fill out
+              as much or as little as you like. It goes straight to our officers in Discord.
+              Join the Discord too, so we can reach you and get you on a raid roster.
             </p>
             <p>
               <a class="btn btn-ghost" data-bind-href="discord" href="https://discord.gg/YOURCODE" rel="noopener noreferrer">
                 Discord invite
               </a>
             </p>
-            <p class="form-note">
-              Set <code>discordInvite</code> and <code>officerEmail</code> in
-              <code>js/config.js</code>. GitHub Pages cannot send email by itself.
-            </p>
           </div>
           <form class="panel" id="apply-form">
             <label>
-              Character name
-              <input name="character" required maxlength="24" autocomplete="nickname" />
+              Discord username
+              <input name="discord" required maxlength="40" placeholder="So officers can message you" />
             </label>
             <label>
-              Class / spec
+              Character name (past or present)
+              <input name="character" required maxlength="40" autocomplete="nickname" />
+            </label>
+            <label>
+              Class and specialization
               <input name="spec" required placeholder="e.g. Restoration Druid" />
             </label>
             <label>
-              Role
+              Main role
               <select name="role" required>
                 <option value="">Select</option>
                 <option>Tank</option>
@@ -143,14 +163,38 @@
               </select>
             </label>
             <label>
-              Warcraft Logs or Raider.IO
+              Raid team
+              <select name="team" data-bind-list="teamOptions"></select>
+            </label>
+            <fieldset class="checks">
+              <legend>Primary interests</legend>
+              <label><input type="checkbox" name="interests" value="Raiding" /> Raiding</label>
+              <label><input type="checkbox" name="interests" value="PvP" /> PvP</label>
+              <label><input type="checkbox" name="interests" value="Dungeons" /> Dungeons</label>
+              <label><input type="checkbox" name="interests" value="Casual" /> Casual</label>
+            </fieldset>
+            <label>
+              Experience
+              <input name="experience" placeholder="Returning player, veteran, new to the content…" />
+            </label>
+            <label>
+              Availability
+              <input name="availability" placeholder="When you typically play" />
+            </label>
+            <label>
+              Warcraft Logs (optional)
               <input name="logs" type="url" placeholder="https://" />
             </label>
             <label>
-              Anything else
-              <textarea name="note" placeholder="Availability, alts, why us."></textarea>
+              Fun fact
+              <textarea name="note" placeholder="Anything you'd like the guild to know!"></textarea>
             </label>
-            <button class="btn btn-gold" type="submit">Open application email</button>
+            <label class="hp" aria-hidden="true">
+              Leave this empty
+              <input name="website" tabindex="-1" autocomplete="off" />
+            </label>
+            <button class="btn btn-gold" type="submit">Send application</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
           </form>
         </div>
       </section>
@@ -160,6 +204,7 @@
           <p class="kicker">Leadership</p>
           <h2>Officers</h2>
           <div class="grid-3" data-bind-list="officers"></div>
+          <p class="callout" data-bind="officersWanted"></p>
         </div>
       </section>
     </main>
