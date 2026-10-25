@@ -8,7 +8,7 @@ window.GUILD = {
   tagline:
     "Organized PvE progression, steady improvement, and a strong community. We take our raids seriously — and real life always comes first.",
   status: "Leveling for launch. Raids open December 9.",
-  discordInvite: "https://discord.gg/bhQgUXudZ",
+  discordInvite: "https://discord.gg/MZcGcPmTNY",
   // Guild bot Worker that receives the apply form, e.g. https://guild-bot.<you>.workers.dev/apply
   // (see Websites\GuildBot). The Discord webhook stays secret inside the Worker.
   applyEndpoint: "https://guild-bot.nytefyre.workers.dev/apply",
@@ -55,9 +55,12 @@ window.GUILD = {
   ],
 
   // days: 0 = Sunday … 6 = Saturday. Times are 24-hour Eastern.
+  // fromRaidHelper: the card's day and times follow the next Raid-Helper post in the
+  // signups channel once the page loads; the values here are only the fallback.
   raids: [
     {
       name: "Main Raid",
+      fromRaidHelper: true,
       label: "Late night",
       days: [3],
       checkIn: "22:45",

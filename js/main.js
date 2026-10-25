@@ -104,16 +104,21 @@ fillList("values", cfg.values, (value) => {
 
 fillList("raids", raids, (raid) => {
   const card = el("article", "panel raid");
+  if (raid.fromRaidHelper) card.dataset.fromRaidHelper = "true";
   card.append(el("p", "kicker", raid.label), el("h3", "", raid.name));
   const rows = [
-    ["Days", raid.days.map((d) => DAY_NAMES[d]).join(" & ")],
-    ["Check-in", raidTime(raid.days, raid.checkIn)],
-    ["Start", raidTime(raid.days, raid.start)],
-    ["Roster", `${raid.roster} players`],
-    ["Loot", raid.loot],
+    ["days", "Days", raid.days.map((d) => DAY_NAMES[d]).join(" & ")],
+    ["checkIn", "Check-in", raidTime(raid.days, raid.checkIn)],
+    ["start", "Start", raidTime(raid.days, raid.start)],
+    ["roster", "Roster", `${raid.roster} players`],
+    ["loot", "Loot", raid.loot],
   ];
   const dl = el("dl", "raid-facts");
-  rows.forEach(([k, v]) => dl.append(el("dt", "", k), el("dd", "", v)));
+  rows.forEach(([key, k, v]) => {
+    const dd = el("dd", "", v);
+    dd.dataset.row = key;
+    dl.append(el("dt", "", k), dd);
+  });
   card.append(dl);
   return card;
 });
@@ -195,7 +200,41 @@ function raidWhen(unix) {
   return `${day} · ${time} ET${showLocal ? ` (${formatTime(at, localTz)} your time)` : ""}`;
 }
 
+const minutes = (hhmm) => hhmm.split(":").reduce((h, m) => Number(h) * 60 + Number(m));
+
+// "12:00 AM ET (Wed 9:00 PM your time)" for a moment in time.
+function etTime(at) {
+  const eastern = new Intl.DateTimeFormat("en-US", { timeZone: RAID_TZ, hour: "numeric", minute: "2-digit" }).format(at);
+  return showLocal ? `${eastern} ET (${formatTime(at, localTz)} your time)` : `${eastern} ET`;
+}
+
+// A raid that starts just after midnight Eastern still reads as the night before.
+function raidNight(at) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", { timeZone: RAID_TZ, weekday: "long", hour: "numeric", hourCycle: "h23" })
+      .formatToParts(at)
+      .map((p) => [p.type, p.value])
+  );
+  if (Number(parts.hour) >= 5) return parts.weekday;
+  const day = DAY_NAMES[(DAY_NAMES.indexOf(parts.weekday) + 6) % 7];
+  return `${day} night`;
+}
+
+// Cards marked fromRaidHelper take their day and times from the next posted raid,
+// keeping the configured gap between check-in and start.
+function syncRaidCards(next) {
+  const plan = raids.find((r) => r.fromRaidHelper);
+  const card = document.querySelector("[data-from-raid-helper]");
+  if (!next || !plan || !card) return;
+  const start = new Date(next.start * 1000);
+  const checkIn = new Date(start.getTime() - (minutes(plan.start) - minutes(plan.checkIn)) * 60000);
+  card.querySelector("[data-row='days']").textContent = raidNight(start);
+  card.querySelector("[data-row='checkIn']").textContent = etTime(checkIn);
+  card.querySelector("[data-row='start']").textContent = etTime(start);
+}
+
 function applyRaids(raids) {
+  syncRaidCards(raids[0]);
   const box = document.querySelector("[data-upcoming]");
   if (!box) return;
   const list = box.querySelector("[data-raid-list]");
