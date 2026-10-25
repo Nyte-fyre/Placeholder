@@ -140,10 +140,18 @@
             </p>
           </div>
           <form class="panel" id="apply-form">
-            <label>
-              Discord username
-              <input name="discord" required maxlength="40" placeholder="So officers can message you" />
-            </label>
+            <div class="signin" data-signin>
+              <a class="btn btn-discord" data-signin-link href="#">Sign in with Discord</a>
+              <p class="form-note">
+                Applications need a Discord sign-in so officers know it's really you. We only see
+                your Discord username, never your email or password.
+              </p>
+            </div>
+            <p class="signed-in" data-signed-in hidden>
+              Signed in as <strong data-signed-name></strong>
+              <button class="link-btn" type="button" data-signout>Not you? Sign out</button>
+            </p>
+            <fieldset class="fields" data-fields disabled>
             <label>
               Character name (past or present)
               <input name="character" required maxlength="40" autocomplete="nickname" />
@@ -194,6 +202,7 @@
               <input name="website" tabindex="-1" autocomplete="off" />
             </label>
             <button class="btn btn-gold" type="submit">Send application</button>
+            </fieldset>
             <p class="form-status" role="status" aria-live="polite"></p>
           </form>
         </div>

@@ -175,17 +175,92 @@ function writeCooldown() {
   }
 }
 
+// Discord sign-in: the guild bot sends people back here with a signed pass in the
+// URL fragment (#discordPass=...). The pass rides along with the application, and the
+// bot checks it, so the Discord account on an application can't be faked.
+const PASS_KEY = "discordPass";
+let memoryPass = "";
+
+function readPass() {
+  try {
+    return sessionStorage.getItem(PASS_KEY) || memoryPass;
+  } catch {
+    return memoryPass;
+  }
+}
+
+function writePass(pass) {
+  memoryPass = pass;
+  try {
+    if (pass) sessionStorage.setItem(PASS_KEY, pass);
+    else sessionStorage.removeItem(PASS_KEY);
+  } catch {
+    // Private windows can block storage; the in-memory copy lasts until the page closes.
+  }
+}
+
+// Reads the name and expiry from a pass. Only for display: the bot does the real check.
+function passInfo(pass) {
+  try {
+    const body = pass.split(".")[0].replace(/-/g, "+").replace(/_/g, "/");
+    const data = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(body), (c) => c.charCodeAt(0))));
+    return data.exp > Date.now() ? data : null;
+  } catch {
+    return null;
+  }
+}
+
+function takePassFromUrl() {
+  const hash = location.hash;
+  if (!hash.startsWith("#discordPass=") && !hash.startsWith("#discordError=")) return "";
+  history.replaceState(null, "", `${location.pathname}${location.search}#apply`);
+  document.querySelector("#apply")?.scrollIntoView();
+  if (hash.startsWith("#discordPass=")) {
+    writePass(decodeURIComponent(hash.slice("#discordPass=".length)));
+    return "";
+  }
+  return hash.endsWith("cancelled")
+    ? "Discord sign-in was cancelled. Sign in to apply here, or use /apply in our Discord."
+    : "Discord sign-in didn't work. Please try again, or use /apply in our Discord.";
+}
+
 if (form) {
   const status = form.querySelector(".form-status");
   const submit = form.querySelector("button[type='submit']");
+  const fields = form.querySelector("[data-fields]");
+  const signin = form.querySelector("[data-signin]");
+  const signedIn = form.querySelector("[data-signed-in]");
   const say = (text, ok) => {
     status.textContent = text;
     status.className = `form-status ${ok ? "ok" : "err"}`;
   };
 
+  const showSignIn = () => {
+    const info = passInfo(readPass());
+    signin.hidden = Boolean(info);
+    signedIn.hidden = !info;
+    fields.disabled = !info || !cfg.applyEndpoint;
+    if (info) form.querySelector("[data-signed-name]").textContent = info.name || info.username;
+  };
+
+  if (cfg.applyEndpoint) {
+    const login = new URL("/auth/login", cfg.applyEndpoint);
+    login.searchParams.set("return", `${location.origin}${location.pathname}`);
+    form.querySelector("[data-signin-link]").href = login.toString();
+  }
+
+  form.querySelector("[data-signout]").addEventListener("click", () => {
+    writePass("");
+    showSignIn();
+  });
+
+  const signInProblem = takePassFromUrl();
+  showSignIn();
   if (!cfg.applyEndpoint) {
-    submit.disabled = true;
+    signin.hidden = true;
     say("Applications through the site aren't open yet. Join the Discord and post in #apply-here.", false);
+  } else if (signInProblem) {
+    say(signInProblem, false);
   }
 
   form.addEventListener("submit", async (event) => {
@@ -200,6 +275,7 @@ if (form) {
     // The guild bot Worker builds the Discord message, so no webhook URL lives in this page.
     const payload = Object.fromEntries(data);
     payload.interests = data.getAll("interests");
+    payload.pass = readPass();
 
     submit.disabled = true;
     say("Sending…", true);
@@ -211,6 +287,12 @@ if (form) {
       });
       if (res.status === 429) {
         say("Too many applications at once. Please wait a minute and try again.", false);
+        return;
+      }
+      if (res.status === 401) {
+        writePass("");
+        showSignIn();
+        say("Your Discord sign-in expired. Please sign in again; your answers are still filled in.", false);
         return;
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
