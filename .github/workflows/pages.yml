@@ -25,7 +25,7 @@ jobs:
       - name: Stage site files
         run: |
           mkdir public
-          cp -r index.html css js README.md .nojekyll public/
+          cp -r index.html css js assets README.md .nojekyll public/
           # Pages lets browsers cache css/js for 10 minutes; a per-commit version
           # makes every deploy load fresh files alongside the new index.html.
           sed -i "s/?v=dev/?v=${GITHUB_SHA::7}/g" public/index.html

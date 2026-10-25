@@ -11,18 +11,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Marcellus&family=Source+Sans+3:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/style.css?v=dev" />
+    <link rel="icon" type="image/png" href="assets/favicon.png?v=dev" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=dev" />
+    <meta name="theme-color" content="#070505" />
   </head>
   <body>
     <div class="bg-runes" aria-hidden="true"></div>
     <header class="site-header">
       <div class="wrap header-inner">
         <a class="brand" href="#top">
-          <span class="brand-mark" aria-hidden="true">✦</span>
-          <span class="brand-name" data-bind="name">&lt;Placeholder&gt;</span>
+          <img class="brand-logo" src="assets/logo-small.webp?v=dev" alt="" width="34" height="34" />
+          <span class="brand-name guild-tag" data-bind="name">&lt;Placeholder&gt;</span>
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
           Menu
@@ -50,18 +53,21 @@
 
     <main id="top">
       <section class="hero">
-        <div class="wrap">
+        <div class="wrap hero-grid">
+          <div>
           <p class="kicker" data-bind="kicker">WoW Forever · Horde</p>
-          <h1 data-bind="name">&lt;Placeholder&gt;</h1>
+          <h1 class="guild-tag" data-bind="name">&lt;Placeholder&gt;</h1>
           <p class="lede" data-bind="tagline"></p>
           <div class="meta-row" data-bind-list="chips"></div>
           <p class="status" data-bind="status"></p>
           <div class="actions">
-            <a class="btn btn-gold" href="#apply">Apply to raid</a>
+            <a class="btn btn-primary" href="#apply">Apply to raid</a>
             <a class="btn btn-ghost" data-bind-href="discord" href="https://discord.gg/YOURCODE" rel="noopener noreferrer">
               Join Discord
             </a>
           </div>
+          </div>
+          <img class="hero-crest" src="assets/logo.webp?v=dev" alt="Guild crest: Horde PvP, WoW Forever" width="640" height="640" />
         </div>
       </section>
 
@@ -219,7 +225,7 @@
               Leave this empty
               <input name="website" tabindex="-1" autocomplete="off" />
             </label>
-            <button class="btn btn-gold" type="submit">Send application</button>
+            <button class="btn btn-primary" type="submit">Send application</button>
             </fieldset>
             <p class="form-status" role="status" aria-live="polite"></p>
           </form>

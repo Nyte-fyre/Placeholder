@@ -66,7 +66,7 @@ function raidTime(days, hhmm) {
 }
 
 setText("[data-bind='name']", cfg.name);
-setText("[data-bind='kicker']", [cfg.game, cfg.faction].filter(Boolean).join(" · "));
+setText("[data-bind='kicker']", [[cfg.faction, cfg.realm].filter(Boolean).join(" "), cfg.game].filter(Boolean).join(" · "));
 setText("[data-bind='tagline']", cfg.tagline);
 setText("[data-bind='status']", cfg.status);
 setText("[data-bind='about']", cfg.about);

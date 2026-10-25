@@ -1,16 +1,24 @@
 :root {
-  --bg: #0b0e14;
-  --bg-raised: #121722;
-  --bg-card: #171d2b;
-  --ink: #e8e4d9;
-  --muted: #9aa3b5;
-  --gold: #d4a54a;
-  --gold-dim: #8c6a2a;
-  --line: rgba(212, 165, 74, 0.28);
-  --danger: #c45c4a;
+  /* Sampled from the guild logo: blood red #ba1512, steel #c4bbb7, near-black. */
+  --bg: #070505;
+  --bg-raised: #120b0b;
+  --bg-card: #170d0d;
+  --ink: #ece6e3;
+  --muted: #a99f9c;
+  --steel: #cfc7c3;
+  --accent: #b8161a;
+  --accent-hover: #d11f22;
+  --accent-dim: #6e1012;
+  /* Lighter red for text on black, so small labels stay readable. */
+  --accent-text: #f0574c;
+  --line: rgba(208, 32, 32, 0.32);
+  --danger: #f0574c;
   --ok: #6fbf8a;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
-  --serif: "Source Serif 4", "Palatino Linotype", Palatino, serif;
+  /* In-game guild name green, with the black outline nameplates use. */
+  --guild-green: #40ff40;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+  --display: "Cinzel", "Trajan Pro", "Palatino Linotype", serif;
+  --tag: "Marcellus", "Palatino Linotype", Palatino, serif;
   --sans: "Source Sans 3", "Segoe UI", sans-serif;
 }
 
@@ -37,8 +45,9 @@ body {
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(1200px 500px at 10% -10%, rgba(212, 165, 74, 0.12), transparent 55%),
-    radial-gradient(900px 400px at 90% 0%, rgba(80, 110, 180, 0.12), transparent 50%),
+    radial-gradient(1100px 520px at 85% -5%, rgba(184, 22, 26, 0.22), transparent 60%),
+    radial-gradient(900px 480px at 0% 30%, rgba(110, 16, 18, 0.18), transparent 60%),
+    radial-gradient(1200px 400px at 50% 110%, rgba(184, 22, 26, 0.12), transparent 60%),
     repeating-linear-gradient(
       -18deg,
       transparent,
@@ -50,7 +59,7 @@ body {
 }
 
 a {
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 img {
@@ -67,7 +76,7 @@ img {
   top: 0;
   z-index: 20;
   backdrop-filter: blur(12px);
-  background: rgba(11, 14, 20, 0.82);
+  background: rgba(7, 5, 5, 0.86);
   border-bottom: 1px solid var(--line);
 }
 
@@ -88,13 +97,13 @@ img {
 }
 
 .brand-mark {
-  color: var(--gold);
+  color: var(--accent-text);
   font-size: 1.35rem;
   line-height: 1;
 }
 
 .brand-name {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-weight: 700;
   letter-spacing: 0.04em;
 }
@@ -113,7 +122,7 @@ img {
 
 .nav a:hover,
 .nav a:focus-visible {
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .nav-toggle {
@@ -130,7 +139,7 @@ img {
 }
 
 .kicker {
-  color: var(--gold);
+  color: var(--accent-text);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 0.78rem;
@@ -140,9 +149,15 @@ img {
 h1,
 h2,
 h3 {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-weight: 700;
   line-height: 1.15;
+  letter-spacing: 0.02em;
+}
+
+h2,
+h3 {
+  color: var(--steel);
 }
 
 h1 {
@@ -188,7 +203,7 @@ h2 {
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  border: 1px solid var(--gold-dim);
+  border: 1px solid var(--accent-dim);
   padding: 0.7rem 1.15rem;
   border-radius: 2px;
   font-weight: 600;
@@ -197,18 +212,20 @@ h2 {
   font-family: inherit;
 }
 
-.btn-gold {
-  background: var(--gold);
-  color: #1a1408;
+.btn-primary {
+  background: linear-gradient(180deg, var(--accent-hover), var(--accent));
+  border-color: #e0383a;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
 }
 
-.btn-gold:hover {
+.btn-primary:hover {
   filter: brightness(1.05);
 }
 
 .btn-ghost {
   background: transparent;
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 section {
@@ -307,7 +324,7 @@ textarea {
 }
 
 .status {
-  color: var(--gold);
+  color: var(--accent-text);
   font-weight: 600;
   margin: 0 0 1.5rem;
 }
@@ -327,7 +344,7 @@ textarea {
 
 .focus-list dt,
 .raid-facts dt {
-  color: var(--gold);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -355,7 +372,7 @@ textarea {
 
 .callout {
   margin-top: 1.25rem;
-  border-left: 3px solid var(--gold);
+  border-left: 3px solid var(--accent-text);
   padding: 0.6rem 1rem;
   background: var(--bg-raised);
 }
@@ -391,7 +408,7 @@ textarea {
 }
 
 .rules li::marker {
-  color: var(--gold);
+  color: var(--accent-text);
   font-weight: 700;
 }
 
@@ -447,7 +464,7 @@ textarea {
   background: none;
   border: 0;
   padding: 0;
-  color: var(--gold);
+  color: var(--accent-text);
   font: inherit;
   font-size: 0.9rem;
   text-decoration: underline;
@@ -472,8 +489,8 @@ textarea {
 }
 
 .announce {
-  background: var(--gold);
-  color: #1a1408;
+  background: linear-gradient(90deg, var(--accent-dim), var(--accent), var(--accent-dim));
+  color: #fff;
   font-weight: 600;
 }
 
@@ -545,7 +562,7 @@ textarea {
 }
 
 .raid-when {
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .raid-meta {
@@ -568,6 +585,62 @@ textarea {
   color: var(--muted);
 }
 
+/* --- Guild tag: <Name> in the in-game nameplate green, outlined in black --- */
+.guild-tag {
+  font-family: var(--tag);
+  font-weight: 400;
+  color: var(--guild-green);
+  letter-spacing: 0.01em;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000,
+    0 0 14px rgba(64, 255, 64, 0.22);
+}
+
+h1.guild-tag {
+  font-size: clamp(2.6rem, 7vw, 4.8rem);
+  -webkit-text-stroke: 1px #000;
+  text-shadow:
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    2px 2px 0 #000,
+    0 0 26px rgba(64, 255, 64, 0.25);
+}
+
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  align-self: center;
+}
+
+.brand {
+  align-items: center;
+}
+
+.brand-name.guild-tag {
+  font-size: 1.15rem;
+}
+
+/* --- Hero with the guild crest --- */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 2rem;
+}
+
+.hero-crest {
+  width: min(100%, 440px);
+  height: auto;
+  justify-self: center;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 40px rgba(184, 22, 26, 0.35));
+}
+
 .site-footer {
   border-top: 1px solid var(--line);
   padding: 1.5rem 0 2.5rem;
@@ -583,6 +656,15 @@ textarea {
 }
 
 @media (max-width: 820px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-crest {
+    order: -1;
+    width: min(70%, 300px);
+  }
+
   .grid-2,
   .grid-2.even,
   .grid-3 {
