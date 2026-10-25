@@ -40,6 +40,14 @@
       </div>
     </header>
 
+    <div class="announce" data-announce hidden>
+      <div class="wrap announce-inner">
+        <span class="announce-mark" aria-hidden="true">📢</span>
+        <span data-announce-text></span>
+        <a data-announce-link href="#" rel="noopener noreferrer" hidden>More</a>
+      </div>
+    </div>
+
     <main id="top">
       <section class="hero">
         <div class="wrap">
@@ -101,6 +109,16 @@
           <p class="muted" data-bind="raidExpectations"></p>
           <div class="grid-2 even" data-bind-list="raids"></div>
           <p class="form-note" data-bind="tzNote"></p>
+          <div class="upcoming" data-upcoming hidden>
+            <h3>Upcoming raids</h3>
+            <p class="muted">Straight from the Raid-Helper posts in our Discord. Sign up there.</p>
+            <ul class="raid-list" data-raid-list></ul>
+            <p class="subscribe">
+              Get every raid in your calendar automatically:
+              <a data-subscribe-google href="#" rel="noopener noreferrer">Google Calendar</a> ·
+              <a data-subscribe-ics href="#">Apple / Outlook</a>
+            </p>
+          </div>
           <p class="callout" data-bind="questions"></p>
         </div>
       </section>

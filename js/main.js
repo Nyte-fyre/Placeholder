@@ -122,19 +122,129 @@ fillList("loot", cfg.loot, (text) => el("p", "", text));
 fillList("rules", cfg.rules, (text) => el("li", "", text));
 fillList("rulesFooter", cfg.rulesFooter, (text) => el("p", "muted", text));
 
-fillList("recruitment", cfg.recruitment, (item) => {
-  const li = el("li");
-  li.append(el("span", "", item.role), el("span", item.open ? "tag-open" : "tag-closed", item.open ? "Open" : "Closed"));
-  return li;
-});
+function renderRecruitment(list) {
+  fillList("recruitment", list, (item) => {
+    const li = el("li");
+    const role = el("span", "need-role", item.role);
+    if (item.note) role.append(el("small", "need-note", item.note));
+    li.append(role, el("span", item.open ? "tag-open" : "tag-closed", item.open ? "Open" : "Closed"));
+    return li;
+  });
+}
+renderRecruitment(cfg.recruitment);
 
 fillList("teamOptions", ["Either", ...raids.map((r) => r.name)], (name) => el("option", "", name));
 
-fillList("officers", cfg.officers, (person) => {
+function officerCard(person) {
   const card = el("article", "officer");
+  if (person.avatar) {
+    const img = el("img", "officer-avatar");
+    img.src = person.avatar;
+    img.alt = "";
+    img.loading = "lazy";
+    card.append(img);
+  }
   card.append(el("h3", "", person.name), el("p", "muted", person.title));
+  if (person.blurb) card.append(el("p", "officer-blurb", person.blurb));
   return card;
-});
+}
+fillList("officers", cfg.officers, officerCard);
+
+// --- Live content from the guild bot ---------------------------------------
+// Officers change these from Discord (/recruit, /bio, /announce); raids come from
+// Raid-Helper. If the bot can't be reached, the page keeps what config.js says.
+
+const sameName = (a, b) => String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+
+function applySite(site) {
+  if (site.recruitment) {
+    renderRecruitment(
+      (cfg.recruitment || []).map((item) => ({ ...item, ...(site.recruitment[item.role] || {}) }))
+    );
+  }
+
+  const bios = site.bios || [];
+  const used = new Set();
+  const officers = (cfg.officers || []).map((person) => {
+    const bio = bios.find((b) => !used.has(b.id) && [b.name, ...(b.names || [])].some((n) => sameName(n, person.name)));
+    if (!bio) return person;
+    used.add(bio.id);
+    return { ...person, title: bio.title || person.title, blurb: bio.blurb, avatar: bio.avatar };
+  });
+  bios.filter((b) => !used.has(b.id)).forEach((b) => officers.push(b));
+  fillList("officers", officers, officerCard);
+
+  const banner = document.querySelector("[data-announce]");
+  if (banner && site.announcement?.text) {
+    banner.querySelector("[data-announce-text]").textContent = site.announcement.text;
+    const link = banner.querySelector("[data-announce-link]");
+    if (/^https:\/\//i.test(site.announcement.link || "")) {
+      link.href = site.announcement.link;
+      link.hidden = false;
+    }
+    banner.hidden = false;
+  }
+}
+
+const gcalTime = (unix) => new Date(unix * 1000).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+
+function raidWhen(unix) {
+  const at = new Date(unix * 1000);
+  const day = new Intl.DateTimeFormat("en-US", { timeZone: RAID_TZ, weekday: "short", month: "short", day: "numeric" }).format(at);
+  const time = new Intl.DateTimeFormat("en-US", { timeZone: RAID_TZ, hour: "numeric", minute: "2-digit" }).format(at);
+  return `${day} · ${time} ET${showLocal ? ` (${formatTime(at, localTz)} your time)` : ""}`;
+}
+
+function applyRaids(raids) {
+  const box = document.querySelector("[data-upcoming]");
+  if (!box) return;
+  const list = box.querySelector("[data-raid-list]");
+  if (!raids.length) {
+    list.replaceChildren(el("li", "muted", "No raids posted yet. Watch #weds-night-raid-signups in our Discord."));
+  } else {
+    list.replaceChildren(
+      ...raids.slice(0, 8).map((raid) => {
+        const li = el("li", "raid-item");
+        const info = el("div", "raid-info");
+        info.append(el("strong", "", raid.title), el("span", "raid-when", raidWhen(raid.start)));
+        const meta = [raid.leader && `Led by ${raid.leader}`, `${raid.signups} signed up`].filter(Boolean).join(" · ");
+        info.append(el("span", "muted raid-meta", meta));
+        const actions = el("div", "raid-actions");
+        const signup = el("a", "btn btn-ghost btn-small", "Sign up on Discord");
+        signup.href = raid.url;
+        signup.rel = "noopener noreferrer";
+        const gcal = el("a", "btn btn-ghost btn-small", "Add to Google Calendar");
+        const g = new URL("https://calendar.google.com/calendar/render");
+        g.searchParams.set("action", "TEMPLATE");
+        g.searchParams.set("text", `${cfg.name}: ${raid.title}`);
+        g.searchParams.set("dates", `${gcalTime(raid.start)}/${gcalTime(raid.end)}`);
+        g.searchParams.set("details", `Sign up on Discord: ${raid.url}`);
+        gcal.href = g.toString();
+        gcal.target = "_blank";
+        gcal.rel = "noopener noreferrer";
+        actions.append(signup, gcal);
+        li.append(info, actions);
+        return li;
+      })
+    );
+  }
+  const feed = new URL("/raids.ics", cfg.botUrl);
+  const webcal = feed.toString().replace(/^https:/, "webcal:");
+  box.querySelector("[data-subscribe-ics]").href = webcal;
+  box.querySelector("[data-subscribe-google]").href = `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcal)}`;
+  box.hidden = false;
+}
+
+if (cfg.botUrl) {
+  fetch(new URL("/site.json", cfg.botUrl))
+    .then((r) => (r.ok ? r.json() : null))
+    .then((site) => site && applySite(site))
+    .catch(() => {});
+  fetch(new URL("/raids", cfg.botUrl))
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => data && !data.error && applyRaids(data.raids || []))
+    .catch(() => {});
+}
 
 document.title = `${cfg.name} — ${[cfg.faction, cfg.game].filter(Boolean).join(" guild on ")}`;
 

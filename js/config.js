@@ -12,6 +12,8 @@ window.GUILD = {
   // Guild bot Worker that receives the apply form, e.g. https://guild-bot.<you>.workers.dev/apply
   // (see Websites\GuildBot). The Discord webhook stays secret inside the Worker.
   applyEndpoint: "https://guild-bot.nytefyre.workers.dev/apply",
+  // Guild bot: upcoming raids (from Raid-Helper) and what officers edit with /recruit, /bio, /announce.
+  botUrl: "https://guild-bot.nytefyre.workers.dev",
   githubRepo: "https://github.com/Nyte-fyre/Placeholder",
   year: "2026",
 
