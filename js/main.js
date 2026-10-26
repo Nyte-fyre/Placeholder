@@ -251,6 +251,11 @@ function applyRaids(raids) {
         const count = `${raid.signups} signed up${raid.tentative ? ` (+${raid.tentative} tentative)` : ""}`;
         const meta = [raid.leader && `Led by ${raid.leader}`, count].filter(Boolean).join(" · ");
         info.append(el("span", "muted raid-meta", meta));
+        if (raid.roles) {
+          const names = { Tank: "Tanks", Healer: "Healers", "Melee DPS": "Melee", "Ranged DPS": "Ranged" };
+          const counts = Object.entries(names).map(([role, label]) => `${label} ${raid.roles[role] || 0}`).join(" · ");
+          info.append(el("span", "muted raid-meta", counts));
+        }
         const actions = el("div", "raid-actions");
         const signup = el("a", "btn btn-ghost btn-small", "Sign up on Discord");
         signup.href = raid.url;
