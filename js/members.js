@@ -20,7 +20,7 @@ document.querySelectorAll("[data-bind='footer']").forEach(
   (n) => (n.textContent = `© ${cfg.year} ${cfg.name}. Fan site — not affiliated with Blizzard Entertainment.`)
 );
 
-// ---- the sign-in pass (kept for a week; the bot checks it on every request) ----
+// ---- the sign-in pass (kept for 30 days; the bot checks it on every request) ----
 
 function readPass() {
   try {
