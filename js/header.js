@@ -26,8 +26,9 @@ function refreshAccount(name) {
 }
 refreshAccount();
 
-// Points a "Sign in with Discord" link straight at discord.com. Phones only open the Discord app
-// for links that go directly there; the bot's /auth/login redirect keeps them in the browser.
+// Points a "Sign in with Discord" link straight at discord.com, which gives Android the chance to
+// open the Discord app (a redirect through the bot never does). iPhones always use Discord's web
+// login for sign-in: Discord excludes these links from opening its iOS app.
 // The link starts as /auth/login (works anywhere) and is swapped for the direct one, refreshed
 // before the bot's 30-minute signature runs out.
 function directSignIn(link, botUrl, returnTo, stay) {
