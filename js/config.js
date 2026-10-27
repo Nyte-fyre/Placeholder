@@ -9,6 +9,11 @@ window.GUILD = {
     "Organized PvE progression, steady improvement, and a strong community. We take our raids seriously — and real life always comes first.",
   status: "Leveling for launch. Raids open December 9.",
   discordInvite: "https://discord.gg/d249H3sCyD",
+  // Discord channels the site links to by name (#name in text becomes a link). Members open them directly;
+  // people not in the server yet get Discord's join prompt.
+  channels: {
+    "questions-and-help": "https://discord.com/channels/1548763149807652874/1562831110424109097",
+  },
   // Guild bot Worker that receives the apply form, e.g. https://guild-bot.<you>.workers.dev/apply
   // (see Websites\GuildBot). The Discord webhook stays secret inside the Worker.
   applyEndpoint: "https://guild-bot.nytefyre.workers.dev/apply",

@@ -73,7 +73,23 @@ setText("[data-bind='about']", cfg.about);
 setText("[data-bind='welcome']", cfg.welcome);
 setText("[data-bind='raidExpectations']", cfg.raidExpectations);
 setText("[data-bind='officersWanted']", cfg.officersWanted);
-setText("[data-bind='questions']", cfg.questions);
+// Text with #channel-name mentions, the known ones turned into links to that Discord channel.
+function withChannelLinks(target, text) {
+  if (!target) return;
+  const parts = String(text || "").split(/(#[a-z0-9-]+)/g);
+  target.replaceChildren(
+    ...parts.map((part) => {
+      const url = cfg.channels?.[part.slice(1)];
+      if (!part.startsWith("#") || !url) return document.createTextNode(part);
+      const a = el("a", "channel-link", part);
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      return a;
+    })
+  );
+}
+withChannelLinks(document.querySelector("[data-bind='questions']"), cfg.questions);
 setText(
   "[data-bind='tzNote']",
   showLocal ? `Times are Eastern. Your local times (${localTz}) are shown in brackets.` : "All times Eastern."
@@ -330,23 +346,8 @@ if (cfg.botUrl) {
 
 document.title = `${cfg.name} — ${[cfg.faction, cfg.game].filter(Boolean).join(" guild on ")}`;
 
-const nav = document.querySelector(".nav");
-const toggle = document.querySelector(".nav-toggle");
 const form = document.querySelector("#apply-form");
 
-if (toggle && nav) {
-  toggle.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", String(open));
-  });
-
-  nav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      nav.classList.remove("open");
-      toggle.setAttribute("aria-expanded", "false");
-    });
-  });
-}
 
 const COOLDOWN_KEY = "applySentAt";
 const COOLDOWN_MS = 10 * 60 * 1000;

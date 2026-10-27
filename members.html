@@ -15,6 +15,11 @@
     <link rel="icon" type="image/png" href="assets/favicon.png?v=dev" />
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=dev" />
     <meta name="theme-color" content="#070505" />
+    <!-- Wowhead item names, icons and hover tooltips for item links -->
+    <script>
+      const whTooltips = { colorLinks: true, iconizeLinks: true, renameLinks: true };
+    </script>
+    <script src="https://wow.zamimg.com/js/tooltips.js" async></script>
   </head>
   <body class="members-page">
     <div class="bg-runes" aria-hidden="true"></div>
@@ -24,11 +29,20 @@
           <img class="brand-logo" src="assets/logo-small.webp?v=dev" alt="" width="34" height="34" />
           <span class="brand-name guild-tag" data-bind="name">&lt;Placeholder&gt;</span>
         </a>
-        <nav class="nav nav-plain">
-          <a href="./">Home</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          Menu
+        </button>
+        <nav class="nav" id="site-nav">
+          <a href="./#about">About</a>
+          <a href="./#values">Values</a>
+          <a href="./#rules">Rules</a>
           <a href="./#raids">Raids</a>
+          <a href="./#recruitment">Recruitment</a>
+          <a href="./#apply">Apply</a>
           <a href="./#loot">Loot</a>
+          <a href="./#officers">Leadership</a>
         </nav>
+        <a class="account" aria-current="page" data-account href="members.html">Member sign in</a>
       </div>
     </header>
 
@@ -76,6 +90,7 @@
           </form>
 
           <div data-my-perf></div>
+          <div data-my-gear></div>
 
           <h2 class="members-h2">Attendance</h2>
           <div class="table-scroll">
@@ -178,6 +193,8 @@
       <h3>Parse per raid</h3>
       <div data-player-chart></div>
       <div data-player-bosses></div>
+      <h3>Gear</h3>
+      <div data-player-gear></div>
       <h3>Loot</h3>
       <ul class="loot-list" data-player-loot></ul>
       <h3>Attendance</h3>
@@ -191,6 +208,7 @@
       </div>
     </footer>
     <script src="js/config.js?v=dev"></script>
+    <script src="js/header.js?v=dev"></script>
     <script src="js/members.js?v=dev"></script>
   </body>
 </html>

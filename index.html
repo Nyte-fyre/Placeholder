@@ -31,16 +31,16 @@
           Menu
         </button>
         <nav class="nav" id="site-nav">
-          <a href="#about">About</a>
-          <a href="#values">Values</a>
-          <a href="#rules">Rules</a>
-          <a href="#raids">Raids</a>
-          <a href="#loot">Loot</a>
-          <a href="#recruitment">Recruitment</a>
-          <a href="#apply">Apply</a>
-          <a href="#officers">Leadership</a>
-          <a class="nav-members" href="members.html">Members</a>
+          <a href="./#about">About</a>
+          <a href="./#values">Values</a>
+          <a href="./#rules">Rules</a>
+          <a href="./#raids">Raids</a>
+          <a href="./#recruitment">Recruitment</a>
+          <a href="./#apply">Apply</a>
+          <a href="./#loot">Loot</a>
+          <a href="./#officers">Leadership</a>
         </nav>
+        <a class="account" data-account href="members.html">Member sign in</a>
       </div>
     </header>
 
@@ -127,21 +127,6 @@
             </p>
           </div>
           <p class="callout" data-bind="questions"></p>
-        </div>
-      </section>
-
-      <section id="loot">
-        <div class="wrap grid-2">
-          <div>
-            <p class="kicker">Loot</p>
-            <h2>Loot Council</h2>
-            <div data-bind-list="loot"></div>
-          </div>
-          <div class="loot-history" data-loot-history hidden>
-            <h3>Recent loot</h3>
-            <p class="muted">Awarded in our raids, newest first. Item names link to Wowhead.</p>
-            <div data-loot-raids></div>
-          </div>
         </div>
       </section>
 
@@ -238,6 +223,21 @@
         </div>
       </section>
 
+      <section id="loot">
+        <div class="wrap grid-2">
+          <div>
+            <p class="kicker">Loot</p>
+            <h2>Loot Council</h2>
+            <div data-bind-list="loot"></div>
+          </div>
+          <div class="loot-history" data-loot-history hidden>
+            <h3>Recent loot</h3>
+            <p class="muted">Awarded in our raids, newest first. Item names link to Wowhead.</p>
+            <div data-loot-raids></div>
+          </div>
+        </div>
+      </section>
+
       <section id="officers">
         <div class="wrap">
           <p class="kicker">Leadership</p>
@@ -255,6 +255,7 @@
       </div>
     </footer>
     <script src="js/config.js?v=dev"></script>
+    <script src="js/header.js?v=dev"></script>
     <script src="js/main.js?v=dev"></script>
   </body>
 </html>

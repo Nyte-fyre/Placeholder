@@ -57,6 +57,7 @@ function show(view) {
 
 function showSignIn(message) {
   writePass("");
+  refreshAccount();
   show("signin");
   const error = $("[data-signin-error]");
   error.hidden = !message;
@@ -173,6 +174,9 @@ function renderMe(me) {
     perf.append(el("h2", "members-h2", "Performance"));
     perf.append(parseChart(me.history, perf.clientWidth || 640), bossTable(me.bosses));
   }
+  const gear = $("[data-my-gear]");
+  gear.replaceChildren();
+  if (me.gear?.length) gear.append(el("h2", "members-h2", "Gear"), gearView(me.gear));
 }
 
 // ---- performance chart (parse per raid, oldest to newest) ----
@@ -284,6 +288,58 @@ function bossTable(bosses) {
   return wrap;
 }
 
+// ---- gear (from each character's latest Warcraft Logs report) ----
+
+// Laid out like the in-game character sheet: left column, right column, weapons.
+const GEAR_SLOTS = [
+  [[0, "Head"], [1, "Neck"], [2, "Shoulder"], [14, "Back"], [4, "Chest"], [8, "Wrist"]],
+  [[9, "Hands"], [5, "Waist"], [6, "Legs"], [7, "Feet"], [10, "Ring"], [11, "Ring"], [12, "Trinket"], [13, "Trinket"]],
+  [[15, "Main hand"], [16, "Off hand"], [17, "Ranged"]],
+];
+
+function gearItem(item) {
+  const a = el("a", `q${item.q || 0}`, `Item ${item.id}`);
+  a.href = `https://www.wowhead.com/classic/item=${item.id}`;
+  a.dataset.wowhead = `item=${item.id}${item.e ? `&ench=${item.e}` : ""}&domain=classic`;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  return a;
+}
+
+function gearView(gear) {
+  if (!gear?.length) {
+    return el("p", "empty", "No gear yet: it's read from the Warcraft Logs report each raid, once officers add one.");
+  }
+  const wrap = el("div", "gear-list");
+  for (const g of gear) {
+    const block = el("div", "gear-char");
+    block.append(el("p", "gear-head", `${g.name}${g.cls ? ` · ${g.cls}` : ""} · as worn ${dayLabel(g.date)}`));
+    const bySlot = Object.fromEntries(g.items.map((i) => [i.s, i]));
+    const grid = el("div", "gear-grid");
+    for (const column of GEAR_SLOTS) {
+      const col = el("ul", "gear-col");
+      for (const [slot, label] of column) {
+        const li = el("li");
+        li.append(el("span", "gear-slot", label), bySlot[slot] ? gearItem(bySlot[slot]) : el("span", "gear-empty", "—"));
+        col.append(li);
+      }
+      grid.append(col);
+    }
+    block.append(grid);
+    wrap.append(block);
+  }
+  return wrap;
+}
+
+// Wowhead's script names and iconizes item links added after it loaded.
+function refreshItemLinks() {
+  try {
+    window.$WowheadPower?.refreshLinks();
+  } catch {
+    // Tooltips are a nicety; links still work without them.
+  }
+}
+
 // ---- player card (officers): click any name ----
 
 let rosterById = {};
@@ -317,8 +373,10 @@ function openPlayer(id) {
     stat(typeof m.parse === "number" ? String(Math.round(m.parse)) : "—", "avg parse (last 8)")
   );
   if (!dialog.open) dialog.showModal();
+  setTimeout(refreshItemLinks);
   $("[data-player-chart]").replaceChildren(parseChart(m.history, $("[data-player-chart]").clientWidth || 640));
   $("[data-player-bosses]").replaceChildren(bossTable(m.bosses));
+  $("[data-player-gear]").replaceChildren(gearView(m.gear));
   const loot = m.lootList.map((i) => {
     const li = el("li");
     li.append(itemLink(i), el("span", "loot-meta", ` ${i.character} · ${dayLabel(i.date)}`));
@@ -585,6 +643,7 @@ document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click
 function render(data) {
   show("app");
   $("[data-user-name]").textContent = data.user.name;
+  refreshAccount(data.user.name);
   $("[data-officer-badge]").hidden = !data.user.officer;
   $("[data-guest-note]").hidden = !data.user.guest;
   $("[data-tabs]").hidden = !data.officer;
@@ -600,6 +659,7 @@ function render(data) {
     renderLoot();
   }
   selectTab("me");
+  setTimeout(refreshItemLinks);
 }
 
 async function load() {
