@@ -231,7 +231,13 @@
             <div data-bind-list="loot"></div>
           </div>
           <div class="loot-history" data-loot-history hidden>
-            <h3>Recent loot</h3>
+            <div class="loot-head">
+              <h3>Recent loot</h3>
+              <div class="seg" role="group" aria-label="Group loot by">
+                <button type="button" data-loot-view="raid" aria-pressed="true">By raid</button>
+                <button type="button" data-loot-view="slot" aria-pressed="false">By slot</button>
+              </div>
+            </div>
             <div data-loot-raids></div>
           </div>
         </div>

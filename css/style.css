@@ -1436,3 +1436,42 @@ html,
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
+
+/* Recent loot: By raid / By slot switch */
+.loot-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+}
+
+.seg button {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+}
+
+.seg button + button {
+  border-left: 1px solid var(--line);
+}
+
+.seg button[aria-pressed="true"] {
+  background: var(--accent-dim);
+  color: var(--ink);
+}
+
+.loot-when {
+  color: var(--muted);
+  font-size: 0.85rem;
+}

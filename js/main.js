@@ -299,35 +299,74 @@ function applyRaids(raids) {
 }
 
 // Loot officers import from Gargul with /raidlog loot, newest raid first.
+// Recent loot, grouped by raid night or by item slot (the visitor's pick is remembered).
+const LOOT_VIEW_KEY = "lootView";
+const SLOT_ORDER = ["Head", "Neck", "Shoulder", "Back", "Chest", "Wrist", "Hands", "Waist", "Legs", "Feet", "Ring", "Trinket", "Weapon", "Off hand", "Ranged", "Other"];
+const lootDay = (date) =>
+  new Date(`${date}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+function lootRow(item, extra) {
+  const li = el("li");
+  const link = el("a", `q${item.quality || 0}`, item.name);
+  link.href = `https://www.wowhead.com/classic/item=${item.itemId}`;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  li.append(link, el("span", "loot-winner", item.character));
+  const tag = el("span", `loot-tag ${item.offspec ? "tag-os" : "tag-ms"}`, item.offspec ? "OS" : "MS");
+  tag.title = item.offspec ? "Off spec" : "Main spec";
+  li.append(tag);
+  if (extra) li.append(el("span", "loot-when", extra));
+  return li;
+}
+
+function lootGroup(title, meta, items, open, extraFor) {
+  const details = el("details", "loot-raid");
+  details.open = open;
+  const summary = el("summary");
+  summary.append(el("strong", "", title), el("span", "muted", ` · ${meta}`));
+  const list = el("ul", "loot-list");
+  list.append(...items.map((item) => lootRow(item, extraFor?.(item))));
+  details.append(summary, list);
+  return details;
+}
+
+function renderLoot(raids, view) {
+  const target = document.querySelector("[data-loot-raids]");
+  if (view === "slot") {
+    const bySlot = {};
+    for (const raid of raids) {
+      for (const item of raid.items) (bySlot[item.slot || "Other"] = bySlot[item.slot || "Other"] || []).push({ ...item, date: raid.date });
+    }
+    const slots = SLOT_ORDER.filter((s) => bySlot[s]).concat(Object.keys(bySlot).filter((s) => !SLOT_ORDER.includes(s)));
+    target.replaceChildren(...slots.map((slot) => lootGroup(slot, plural(bySlot[slot].length, "item"), bySlot[slot], false, (item) => lootDay(item.date))));
+  } else {
+    target.replaceChildren(...raids.map((raid, i) => lootGroup(raid.title, `${lootDay(raid.date)} · ${plural(raid.items.length, "item")}`, raid.items, i === 0)));
+  }
+  document.querySelectorAll("[data-loot-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lootView === view)));
+}
+
 function applyLoot(raids) {
   const box = document.querySelector("[data-loot-history]");
   if (!box || !raids.length) return;
-  box.querySelector("[data-loot-raids]").replaceChildren(
-    ...raids.map((raid, i) => {
-      const details = el("details", "loot-raid");
-      details.open = i === 0;
-      const day = new Date(`${raid.date}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
-      const summary = el("summary", "", "");
-      summary.append(el("strong", "", raid.title), el("span", "muted", ` · ${day} · ${raid.items.length} item${raid.items.length === 1 ? "" : "s"}`));
-      const list = el("ul", "loot-list");
-      list.append(
-        ...raid.items.map((item) => {
-          const li = el("li");
-          const link = el("a", `q${item.quality || 0}`, item.name);
-          link.href = `https://www.wowhead.com/classic/item=${item.itemId}`;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          li.append(link, el("span", "loot-winner", item.character));
-          const tag = el("span", `loot-tag ${item.offspec ? "tag-os" : "tag-ms"}`, item.offspec ? "OS" : "MS");
-          tag.title = item.offspec ? "Off spec" : "Main spec";
-          li.append(tag);
-          return li;
-        })
-      );
-      details.append(summary, list);
-      return details;
+  let view = "raid";
+  try {
+    view = localStorage.getItem(LOOT_VIEW_KEY) === "slot" ? "slot" : "raid";
+  } catch {
+    // Storage blocked: start on the raid view.
+  }
+  document.querySelectorAll("[data-loot-view]").forEach((b) =>
+    b.addEventListener("click", () => {
+      view = b.dataset.lootView;
+      try {
+        localStorage.setItem(LOOT_VIEW_KEY, view);
+      } catch {
+        // Only a convenience.
+      }
+      renderLoot(raids, view);
     })
   );
+  renderLoot(raids, view);
   box.hidden = false;
 }
 
