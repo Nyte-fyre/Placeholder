@@ -98,6 +98,13 @@ function parseCell(p) {
   return el("span", `parse ${parseClass(p)}`, typeof p === "number" ? String(Math.round(p)) : "—");
 }
 
+// Every award says whether it was main spec or off spec.
+function specTag(item) {
+  const tag = el("span", `loot-tag ${item.offspec ? "tag-os" : "tag-ms"}`, item.offspec ? "OS" : "MS");
+  tag.title = item.offspec ? "Off spec" : "Main spec";
+  return tag;
+}
+
 function itemLink(item) {
   const a = el("a", `q${item.quality || 0}`, item.name);
   a.href = `https://www.wowhead.com/classic/item=${item.itemId}`;
@@ -162,7 +169,7 @@ function renderMe(me) {
   const loot = me.loot.map((i) => {
     const li = el("li");
     li.append(itemLink(i), el("span", "loot-meta", ` ${i.character} · ${dayLabel(i.date)} · ${i.raid}`));
-    if (i.offspec) li.append(el("span", "loot-tag", "Off-spec"));
+    li.append(specTag(i));
     return li;
   });
   $("[data-my-loot]").replaceChildren(...loot);
@@ -297,10 +304,11 @@ const GEAR_SLOTS = [
   [[15, "Main hand"], [16, "Off hand"], [17, "Ranged"]],
 ];
 
-function gearItem(item) {
+// worn: every item id on the character, so Wowhead shows set bonuses as e.g. (8/8).
+function gearItem(item, worn = []) {
   const a = el("a", `q${item.q || 0}`, `Item ${item.id}`);
   a.href = `https://www.wowhead.com/classic/item=${item.id}`;
-  a.dataset.wowhead = `item=${item.id}${item.e ? `&ench=${item.e}` : ""}&domain=classic`;
+  a.dataset.wowhead = `item=${item.id}${item.e ? `&ench=${item.e}` : ""}${worn.length ? `&pcs=${worn.join(":")}` : ""}&domain=classic`;
   a.target = "_blank";
   a.rel = "noopener noreferrer";
   return a;
@@ -320,7 +328,7 @@ function gearView(gear) {
       const col = el("ul", "gear-col");
       for (const [slot, label] of column) {
         const li = el("li");
-        li.append(el("span", "gear-slot", label), bySlot[slot] ? gearItem(bySlot[slot]) : el("span", "gear-empty", "—"));
+        li.append(el("span", "gear-slot", label), bySlot[slot] ? gearItem(bySlot[slot], g.items.map((i) => i.id)) : el("span", "gear-empty", "—"));
         col.append(li);
       }
       grid.append(col);
@@ -372,7 +380,11 @@ function openPlayer(id) {
     stat(rate === null ? "—" : rate.toFixed(2), "items per raid"),
     stat(typeof m.parse === "number" ? String(Math.round(m.parse)) : "—", "avg parse (last 8)")
   );
-  if (!dialog.open) dialog.showModal();
+  if (!dialog.open) {
+    dialog.show();
+    $("[data-card-backdrop]").hidden = false;
+    document.body.classList.add("card-open");
+  }
   setTimeout(refreshItemLinks);
   $("[data-player-chart]").replaceChildren(parseChart(m.history, $("[data-player-chart]").clientWidth || 640));
   $("[data-player-bosses]").replaceChildren(bossTable(m.bosses));
@@ -380,7 +392,7 @@ function openPlayer(id) {
   const loot = m.lootList.map((i) => {
     const li = el("li");
     li.append(itemLink(i), el("span", "loot-meta", ` ${i.character} · ${dayLabel(i.date)}`));
-    if (i.offspec) li.append(el("span", "loot-tag", "Off-spec"));
+    li.append(specTag(i));
     return li;
   });
   $("[data-player-loot]").replaceChildren(...(loot.length ? loot : [el("li", "empty", "No loot yet.")]));
@@ -396,10 +408,16 @@ function openPlayer(id) {
   dialog.scrollTop = 0;
 }
 
-$("[data-player-close]").addEventListener("click", () => $("[data-player-card]").close());
-// Clicking the dimmed backdrop closes the card too.
-$("[data-player-card]").addEventListener("click", (event) => {
-  if (event.target === event.currentTarget) event.currentTarget.close();
+const closePlayer = () => $("[data-player-card]").close();
+$("[data-player-card]").addEventListener("close", () => {
+  $("[data-card-backdrop]").hidden = true;
+  document.body.classList.remove("card-open");
+});
+$("[data-player-close]").addEventListener("click", closePlayer);
+// Clicking the dimmed background or pressing Escape closes the card too.
+$("[data-card-backdrop]").addEventListener("click", closePlayer);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && $("[data-player-card]").open) closePlayer();
 });
 
 // ---- All raids (officers) ----
@@ -459,7 +477,7 @@ function raidCard(raid, open) {
       const winner = el("span", "loot-meta", " → ");
       winner.append(personLink(i.owner, i.character));
       li.append(itemLink(i), winner);
-      if (i.offspec) li.append(el("span", "loot-tag", "Off-spec"));
+      li.append(specTag(i));
       ul.append(li);
     }
     body.append(ul);

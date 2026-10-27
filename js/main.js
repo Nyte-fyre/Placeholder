@@ -318,7 +318,9 @@ function applyLoot(raids) {
           link.target = "_blank";
           link.rel = "noopener noreferrer";
           li.append(link, el("span", "loot-winner", item.character));
-          if (item.offspec) li.append(el("span", "loot-tag", "Off-spec"));
+          const tag = el("span", `loot-tag ${item.offspec ? "tag-os" : "tag-ms"}`, item.offspec ? "OS" : "MS");
+          tag.title = item.offspec ? "Off spec" : "Main spec";
+          li.append(tag);
           return li;
         })
       );

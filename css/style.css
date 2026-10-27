@@ -1156,6 +1156,11 @@ button.person:focus-visible {
 
 /* Player card */
 .player-card {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 60;
+  height: fit-content;
   width: min(760px, calc(100% - 2rem));
   max-height: calc(100vh - 3rem);
   overflow-y: auto;
@@ -1166,8 +1171,15 @@ button.person:focus-visible {
   padding: 1.25rem 1.5rem 1.5rem;
 }
 
-.player-card::backdrop {
+.card-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
   background: rgba(0, 0, 0, 0.7);
+}
+
+body.card-open {
+  overflow: hidden;
 }
 
 .player-head {
@@ -1385,4 +1397,42 @@ button.person:focus-visible {
 
 .gear-col a:hover {
   text-decoration: underline;
+}
+
+/* MS / OS tags on loot */
+.loot-tag.tag-ms {
+  color: var(--ok);
+  border-color: rgba(111, 191, 138, 0.45);
+}
+
+.loot-tag.tag-os {
+  color: #d0a35a;
+  border-color: rgba(208, 163, 90, 0.45);
+}
+
+/* Scrollbars in the guild colors */
+html,
+.player-card,
+.table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-dim) var(--bg);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-dim);
+  border: 2px solid var(--bg);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
