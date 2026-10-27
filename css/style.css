@@ -1093,3 +1093,37 @@ h1.guild-tag {
 .data-table td:first-child {
   white-space: nowrap;
 }
+
+.guest-note {
+  border-left: 3px solid var(--accent);
+  background: var(--bg-card);
+  padding: 0.6rem 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.char-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.char-form label {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.char-form input {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  width: 12rem;
+  max-width: 100%;
+}
+
+.char-form .form-status {
+  margin: 0;
+}

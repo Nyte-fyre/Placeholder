@@ -38,7 +38,7 @@
 
       <!-- Signed out -->
       <section class="panel members-signin" data-view="signin" hidden>
-        <p>Sign in with Discord to see your raid attendance and the loot you've won. Only you (and officers) can see your attendance.</p>
+        <p>Sign in with Discord to see your raid attendance and the loot you've won. Only you (and officers) can see your attendance. Pugging with us? You can sign in too, even if you're not in our Discord.</p>
         <a class="btn btn-discord" data-signin-link href="#">Sign in with Discord</a>
         <p class="form-status err" data-signin-error hidden></p>
       </section>
@@ -62,8 +62,17 @@
         </div>
 
         <section class="tab-panel" data-panel="me">
+          <p class="guest-note" data-guest-note hidden>
+            You're not in our Discord, so you're signed in as a guest: you see your own raids and loot.
+          </p>
           <div class="stat-row" data-my-stats></div>
           <p class="hint" data-my-chars></p>
+          <form class="char-form" data-char-form>
+            <label for="char-name">Add a character</label>
+            <input id="char-name" name="character" maxlength="40" autocomplete="off" placeholder="Character name" required />
+            <button class="btn btn-ghost btn-small" type="submit">Link</button>
+            <span class="form-status" data-char-status></span>
+          </form>
 
           <h2 class="members-h2">Attendance</h2>
           <div class="table-scroll">
@@ -111,7 +120,7 @@
 
         <p class="hint members-foot">
           Bench counts as attended. Absence sign-ups are excused. Parses come from Warcraft Logs when officers add a log.
-          Link your characters with <code>/character</code> in Discord.
+          Link your characters above (or with <code>/character</code> in Discord) so logs and loot find you.
         </p>
       </div>
     </main>

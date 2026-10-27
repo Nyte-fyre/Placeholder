@@ -144,8 +144,8 @@ function renderMe(me) {
     stat(String(me.loot.length), "items won")
   );
   $("[data-my-chars]").textContent = me.characters.length
-    ? `Your characters: ${me.characters.join(", ")}. Add more with /character in Discord.`
-    : "Tell the bot your characters with /character in Discord, so logs and loot find you.";
+    ? `Your characters: ${me.characters.join(", ")}.`
+    : "Add your character below so logs and loot find you.";
 
   const rows = me.history.map((h) => {
     const tr = el("tr");
@@ -331,6 +331,7 @@ function render(data) {
   show("app");
   $("[data-user-name]").textContent = data.user.name;
   $("[data-officer-badge]").hidden = !data.user.officer;
+  $("[data-guest-note]").hidden = !data.user.guest;
   $("[data-tabs]").hidden = !data.officer;
   renderMe(data.me);
   if (data.officer) {
@@ -349,7 +350,6 @@ async function load() {
     const res = await fetch(new URL("/members", cfg.botUrl), { headers: { Authorization: `Bearer ${pass}` } });
     const data = await res.json().catch(() => ({}));
     if (res.status === 401) return showSignIn("Your sign-in expired. Please sign in again.");
-    if (data.error === "not-member") return showSignIn("That Discord account isn't in our server. Join the Discord first, then sign in again.");
     if (!res.ok) throw new Error(data.error || "The guild bot didn't answer.");
     render(data);
   } catch (err) {
@@ -366,6 +366,35 @@ if (cfg.botUrl) {
 }
 
 $("[data-signout]").addEventListener("click", () => showSignIn());
+
+// Link a character (same as /character in Discord), then reload the data.
+$("[data-char-form]").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const status = $("[data-char-status]");
+  const button = form.querySelector("button");
+  button.disabled = true;
+  status.className = "form-status";
+  status.textContent = "Linking…";
+  try {
+    const res = await fetch(new URL("/members", cfg.botUrl), {
+      method: "POST",
+      headers: { Authorization: `Bearer ${readPass()}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ character: form.character.value.trim() }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) return showSignIn("Your sign-in expired. Please sign in again.");
+    if (!res.ok) throw new Error(data.error || "That didn't work.");
+    form.reset();
+    status.textContent = "";
+    await load();
+  } catch (err) {
+    status.className = "form-status err";
+    status.textContent = err.message;
+  } finally {
+    button.disabled = false;
+  }
+});
 
 const signInProblem = takePassFromUrl();
 if (signInProblem) showSignIn(signInProblem);
