@@ -59,6 +59,7 @@
           <button type="button" role="tab" aria-selected="true" data-tab="me">My raids</button>
           <button type="button" role="tab" aria-selected="false" data-tab="raids">All raids</button>
           <button type="button" role="tab" aria-selected="false" data-tab="roster">Roster</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="loot">Loot</button>
         </div>
 
         <section class="tab-panel" data-panel="me">
@@ -73,6 +74,8 @@
             <button class="btn btn-ghost btn-small" type="submit">Link</button>
             <span class="form-status" data-char-status></span>
           </form>
+
+          <div data-my-perf></div>
 
           <h2 class="members-h2">Attendance</h2>
           <div class="table-scroll">
@@ -118,12 +121,68 @@
           <p class="empty" data-roster-empty hidden>Nobody to show yet.</p>
         </section>
 
+        <section class="tab-panel" data-panel="loot" hidden>
+          <p class="hint">
+            Loot per player across every logged raid. <strong>Per raid</strong> is main-spec items per raid attended; lower means
+            they've had less. Click a name for their full history and parse graph.
+          </p>
+          <div class="filters">
+            <input type="search" placeholder="Search name" aria-label="Search name" data-loot-search />
+            <select aria-label="Role" data-loot-role>
+              <option value="">All roles</option>
+              <option>Tank</option>
+              <option>Healer</option>
+              <option>DPS</option>
+            </select>
+            <select aria-label="Class" data-loot-class>
+              <option value="">All classes</option>
+            </select>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table sortable" data-loot-table>
+              <thead>
+                <tr>
+                  <th data-sort="name">Member</th>
+                  <th data-sort="spec">Spec</th>
+                  <th data-sort="ms" class="num">Items</th>
+                  <th data-sort="os" class="num">Off-spec</th>
+                  <th data-sort="raids" class="num">Raids</th>
+                  <th data-sort="rate" class="num">Per raid</th>
+                  <th data-sort="days" class="num">Since last</th>
+                  <th data-sort="parse" class="num">Avg parse</th>
+                  <th>Last item</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="empty" data-loot-empty hidden>Nobody matches.</p>
+        </section>
+
         <p class="hint members-foot">
           Bench counts as attended. Absence sign-ups are excused. Parses come from Warcraft Logs when officers add a log.
           Link your characters above (or with <code>/character</code> in Discord) so logs and loot find you.
         </p>
       </div>
     </main>
+
+    <dialog class="player-card" data-player-card aria-labelledby="player-name">
+      <div class="player-head">
+        <div>
+          <h2 id="player-name" data-player-name></h2>
+          <p class="hint" data-player-sub></p>
+        </div>
+        <button class="btn btn-ghost btn-small" type="button" data-player-close>Close</button>
+      </div>
+      <div class="stat-row" data-player-stats></div>
+      <h3>Parse per raid</h3>
+      <div data-player-chart></div>
+      <div data-player-bosses></div>
+      <h3>Loot</h3>
+      <ul class="loot-list" data-player-loot></ul>
+      <h3>Attendance</h3>
+      <div class="attendance-strip" data-player-attendance></div>
+    </dialog>
 
     <footer class="site-footer">
       <div class="wrap footer-inner">
