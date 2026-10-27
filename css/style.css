@@ -590,6 +590,71 @@ textarea {
   color: var(--muted);
 }
 
+/* --- Loot history (from Gargul via the bot) --- */
+.loot-history h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.4rem;
+}
+
+.loot-raid {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  padding: 0.75rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.loot-raid summary {
+  cursor: pointer;
+}
+
+.loot-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.loot-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+}
+
+.loot-list a {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.loot-list a:hover {
+  text-decoration: underline;
+}
+
+.loot-winner {
+  color: var(--steel);
+}
+
+.loot-winner::before {
+  content: "→ ";
+  color: var(--muted);
+}
+
+.loot-tag {
+  font-size: 0.78rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 0 0.35rem;
+}
+
+/* In-game item quality colors, nudged lighter where needed to read on black. */
+.q0 { color: var(--ink); }
+.q1 { color: #ffffff; }
+.q2 { color: #1eff00; }
+.q3 { color: #3a8eff; }
+.q4 { color: #b45cf5; }
+.q5 { color: #ff8000; }
+
 /* --- Guild tag: <Name> in the in-game nameplate green, outlined in black --- */
 .guild-tag {
   font-family: var(--tag);

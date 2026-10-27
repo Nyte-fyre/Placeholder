@@ -282,7 +282,42 @@ function applyRaids(raids) {
   box.hidden = false;
 }
 
+// Loot officers import from Gargul with /raidlog loot, newest raid first.
+function applyLoot(raids) {
+  const box = document.querySelector("[data-loot-history]");
+  if (!box || !raids.length) return;
+  box.querySelector("[data-loot-raids]").replaceChildren(
+    ...raids.map((raid, i) => {
+      const details = el("details", "loot-raid");
+      details.open = i === 0;
+      const day = new Date(`${raid.date}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+      const summary = el("summary", "", "");
+      summary.append(el("strong", "", raid.title), el("span", "muted", ` · ${day} · ${raid.items.length} item${raid.items.length === 1 ? "" : "s"}`));
+      const list = el("ul", "loot-list");
+      list.append(
+        ...raid.items.map((item) => {
+          const li = el("li");
+          const link = el("a", `q${item.quality || 0}`, item.name);
+          link.href = `https://www.wowhead.com/classic/item=${item.itemId}`;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          li.append(link, el("span", "loot-winner", item.character));
+          if (item.offspec) li.append(el("span", "loot-tag", "Off-spec"));
+          return li;
+        })
+      );
+      details.append(summary, list);
+      return details;
+    })
+  );
+  box.hidden = false;
+}
+
 if (cfg.botUrl) {
+  fetch(new URL("/loot.json", cfg.botUrl))
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => data && applyLoot(data.raids || []))
+    .catch(() => {});
   fetch(new URL("/site.json", cfg.botUrl))
     .then((r) => (r.ok ? r.json() : null))
     .then((site) => site && applySite(site))
