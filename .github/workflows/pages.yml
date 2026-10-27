@@ -25,11 +25,11 @@ jobs:
       - name: Stage site files
         run: |
           mkdir public
-          cp -r index.html css js assets README.md .nojekyll public/
+          cp -r index.html members.html css js assets README.md .nojekyll public/
           # Pages lets browsers cache css/js for 10 minutes; a per-commit version
           # makes every deploy load fresh files alongside the new index.html.
-          sed -i "s/?v=dev/?v=${GITHUB_SHA::7}/g" public/index.html
-          grep -q "?v=dev" public/index.html && { echo "cache-bust tokens left in index.html"; exit 1; } || true
+          sed -i "s/?v=dev/?v=${GITHUB_SHA::7}/g" public/index.html public/members.html
+          grep -q "?v=dev" public/index.html public/members.html && { echo "cache-bust tokens left in index.html"; exit 1; } || true
       - uses: actions/configure-pages@v5
         with:
           enablement: true

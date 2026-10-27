@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Members — raid attendance and loot</title>
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Marcellus&family=Source+Sans+3:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css?v=dev" />
+    <link rel="icon" type="image/png" href="assets/favicon.png?v=dev" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=dev" />
+    <meta name="theme-color" content="#070505" />
+  </head>
+  <body class="members-page">
+    <div class="bg-runes" aria-hidden="true"></div>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="./">
+          <img class="brand-logo" src="assets/logo-small.webp?v=dev" alt="" width="34" height="34" />
+          <span class="brand-name guild-tag" data-bind="name">&lt;Placeholder&gt;</span>
+        </a>
+        <nav class="nav nav-plain">
+          <a href="./">Home</a>
+          <a href="./#raids">Raids</a>
+          <a href="./#loot">Loot</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap members">
+      <p class="kicker">Members</p>
+      <h1 class="members-title">Raid history</h1>
+
+      <!-- Signed out -->
+      <section class="panel members-signin" data-view="signin" hidden>
+        <p>Sign in with Discord to see your raid attendance and the loot you've won. Only you (and officers) can see your attendance.</p>
+        <a class="btn btn-discord" data-signin-link href="#">Sign in with Discord</a>
+        <p class="form-status err" data-signin-error hidden></p>
+      </section>
+
+      <p class="members-loading" data-view="loading">Loading…</p>
+
+      <!-- Signed in -->
+      <div data-view="app" hidden>
+        <div class="members-bar">
+          <p class="signed-in">
+            Signed in as <strong data-user-name></strong>
+            <span class="officer-badge" data-officer-badge hidden>Officer</span>
+          </p>
+          <button class="btn btn-ghost btn-small" type="button" data-signout>Sign out</button>
+        </div>
+
+        <div class="tabs" role="tablist" data-tabs hidden>
+          <button type="button" role="tab" aria-selected="true" data-tab="me">My raids</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="raids">All raids</button>
+          <button type="button" role="tab" aria-selected="false" data-tab="roster">Roster</button>
+        </div>
+
+        <section class="tab-panel" data-panel="me">
+          <div class="stat-row" data-my-stats></div>
+          <p class="hint" data-my-chars></p>
+
+          <h2 class="members-h2">Attendance</h2>
+          <div class="table-scroll">
+            <table class="data-table" data-my-history>
+              <thead>
+                <tr><th>Date</th><th>Raid</th><th>Status</th><th>Character</th><th class="num">Parse</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="empty" data-my-history-empty hidden>No raids logged for you yet. Raids open December 9.</p>
+
+          <h2 class="members-h2">Loot won</h2>
+          <ul class="loot-list" data-my-loot></ul>
+          <p class="empty" data-my-loot-empty hidden>No loot yet.</p>
+        </section>
+
+        <section class="tab-panel" data-panel="raids" hidden>
+          <p class="hint">Every logged raid, newest first. Open one to see who was there, the loot and parses.</p>
+          <div data-raids></div>
+          <p class="empty" data-raids-empty hidden>No raids logged yet.</p>
+        </section>
+
+        <section class="tab-panel" data-panel="roster" hidden>
+          <p class="hint">Attendance over the last 8 counted raids. Click a column to sort.</p>
+          <div class="table-scroll">
+            <table class="data-table sortable" data-roster>
+              <thead>
+                <tr>
+                  <th data-sort="name">Member</th>
+                  <th data-sort="percent" class="num">Attendance</th>
+                  <th data-sort="attended" class="num">Raids</th>
+                  <th data-sort="noShows" class="num">No-shows</th>
+                  <th data-sort="streak" class="num">Streak</th>
+                  <th data-sort="loot" class="num">Loot</th>
+                  <th data-sort="parse" class="num">Avg parse</th>
+                  <th>Last item</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="empty" data-roster-empty hidden>Nobody to show yet.</p>
+        </section>
+
+        <p class="hint members-foot">
+          Bench counts as attended. Absence sign-ups are excused. Parses come from Warcraft Logs when officers add a log.
+          Link your characters with <code>/character</code> in Discord.
+        </p>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-inner">
+        <span data-bind="footer"></span>
+        <a href="./">Back to the guild site</a>
+      </div>
+    </footer>
+    <script src="js/config.js?v=dev"></script>
+    <script src="js/members.js?v=dev"></script>
+  </body>
+</html>
