@@ -490,9 +490,7 @@ if (form) {
   };
 
   if (cfg.applyEndpoint) {
-    const login = new URL("/auth/login", cfg.applyEndpoint);
-    login.searchParams.set("return", `${location.origin}${location.pathname}`);
-    form.querySelector("[data-signin-link]").href = login.toString();
+    directSignIn(form.querySelector("[data-signin-link]"), new URL(cfg.applyEndpoint).origin, `${location.origin}${location.pathname}`, false);
   }
 
   form.querySelector("[data-signout]").addEventListener("click", () => {

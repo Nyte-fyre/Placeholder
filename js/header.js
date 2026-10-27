@@ -26,6 +26,34 @@ function refreshAccount(name) {
 }
 refreshAccount();
 
+// Points a "Sign in with Discord" link straight at discord.com. Phones only open the Discord app
+// for links that go directly there; the bot's /auth/login redirect keeps them in the browser.
+// The link starts as /auth/login (works anywhere) and is swapped for the direct one, refreshed
+// before the bot's 30-minute signature runs out.
+function directSignIn(link, botUrl, returnTo, stay) {
+  if (!link || !botUrl) return;
+  const params = new URLSearchParams({ return: returnTo, ...(stay && { stay: "1" }) });
+  link.href = `${new URL("/auth/login", botUrl)}?${params}`;
+  let expires = 0;
+  const refresh = async () => {
+    try {
+      const res = await fetch(`${new URL("/auth/url", botUrl)}?${params}`);
+      const data = await res.json();
+      if (!res.ok || !data.url) return;
+      link.href = data.url;
+      expires = data.expires;
+    } catch {
+      // Keep the /auth/login link: it still signs people in, just through the browser on phones.
+    }
+  };
+  refresh();
+  setInterval(refresh, 20 * 60 * 1000);
+  // Phones pause timers in background tabs: refresh when the page comes back if it's close to expiring.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && expires - Date.now() < 5 * 60 * 1000) refresh();
+  });
+}
+
 const menuToggle = document.querySelector(".nav-toggle");
 const siteNav = document.querySelector("#site-nav");
 if (menuToggle && siteNav) {

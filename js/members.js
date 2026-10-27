@@ -1017,12 +1017,7 @@ async function load() {
   }
 }
 
-if (cfg.botUrl) {
-  const login = new URL("/auth/login", cfg.botUrl);
-  login.searchParams.set("return", `${location.origin}${location.pathname}`);
-  login.searchParams.set("stay", "1");
-  $("[data-signin-link]").href = login.toString();
-}
+directSignIn($("[data-signin-link]"), cfg.botUrl, `${location.origin}${location.pathname}`, true);
 
 $("[data-signout]").addEventListener("click", () => showSignIn());
 
