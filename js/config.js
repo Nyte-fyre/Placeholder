@@ -6,7 +6,7 @@ window.GUILD = {
   faction: "Horde",
   realm: "PvP", // realm type; Forever realms are listed by type, not name
   tagline:
-    "Organized PvE progression, steady improvement, and a strong community. We take our raids seriously — and real life always comes first.",
+    "Organized PvE progression, steady improvement, and a strong community. We take our raids seriously, and real life always comes first.",
   status: "Leveling for launch. Raids open December 9.",
   discordInvite: "https://discord.gg/d249H3sCyD",
   // Discord channels the site links to by name (#name in text becomes a link). Members open them directly;
@@ -100,7 +100,7 @@ window.GUILD = {
   ],
   rulesFooter: [
     "Leadership reserves the right to address behavior that harms the community. Depending on the situation, this may mean a conversation, warning, removal from an event, or removal from the guild.",
-    "These guidelines exist to help us build a reliable, enjoyable community — not to make the game feel like a second job.",
+    "These guidelines exist to help us build a reliable, enjoyable community, not to make the game feel like a second job.",
     "Welcome aboard. Let's build something great together!",
   ],
   questions:

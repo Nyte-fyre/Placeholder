@@ -17,7 +17,7 @@ function el(tag, className, text) {
 
 document.querySelectorAll("[data-bind='name']").forEach((n) => (n.textContent = cfg.name || ""));
 document.querySelectorAll("[data-bind='footer']").forEach(
-  (n) => (n.textContent = `© ${cfg.year} ${cfg.name}. Fan site — not affiliated with Blizzard Entertainment.`)
+  (n) => (n.textContent = `© ${cfg.year} ${cfg.name}. Fan site, not affiliated with Blizzard Entertainment.`)
 );
 
 // ---- the sign-in pass (kept for a week; the bot checks it on every request) ----

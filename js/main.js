@@ -94,7 +94,7 @@ setText(
   "[data-bind='tzNote']",
   showLocal ? `Times are Eastern. Your local times (${localTz}) are shown in brackets.` : "All times Eastern."
 );
-setText("[data-bind='footer']", `© ${cfg.year} ${cfg.name}. Fan site — not affiliated with Blizzard Entertainment.`);
+setText("[data-bind='footer']", `© ${cfg.year} ${cfg.name}. Fan site, not affiliated with Blizzard Entertainment.`);
 setHref("[data-bind-href='discord']", cfg.discordInvite);
 setHref("[data-bind-href='github']", cfg.githubRepo);
 
