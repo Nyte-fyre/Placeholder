@@ -299,7 +299,7 @@ function applyRaids(raids) {
 }
 
 // Loot officers import from Gargul with /raidlog loot, newest raid first.
-// Recent loot, grouped by raid night or by item slot (the visitor's pick is remembered).
+// Recent loot, grouped by raid night, boss or item slot (the visitor's pick is remembered).
 const LOOT_VIEW_KEY = "lootView";
 const SLOT_ORDER = ["Head", "Neck", "Shoulder", "Back", "Chest", "Wrist", "Hands", "Waist", "Legs", "Feet", "Ring", "Trinket", "Weapon", "Off hand", "Ranged", "Other"];
 const lootDay = (date) =>
@@ -333,7 +333,15 @@ function lootGroup(title, meta, items, open, extraFor) {
 
 function renderLoot(raids, view) {
   const target = document.querySelector("[data-loot-raids]");
-  if (view === "slot") {
+  if (view === "boss") {
+    // Bosses in the order they first show up (newest raid first); unknown bosses last.
+    const byBoss = {};
+    for (const raid of raids) {
+      for (const item of raid.items) (byBoss[item.boss || "Other drops"] = byBoss[item.boss || "Other drops"] || []).push({ ...item, date: raid.date });
+    }
+    const bosses = Object.keys(byBoss).sort((a, b) => (a === "Other drops") - (b === "Other drops") || (a === "Shared drops") - (b === "Shared drops"));
+    target.replaceChildren(...bosses.map((boss) => lootGroup(boss, plural(byBoss[boss].length, "item"), byBoss[boss], false, (item) => lootDay(item.date))));
+  } else if (view === "slot") {
     const bySlot = {};
     for (const raid of raids) {
       for (const item of raid.items) (bySlot[item.slot || "Other"] = bySlot[item.slot || "Other"] || []).push({ ...item, date: raid.date });
@@ -351,7 +359,7 @@ function applyLoot(raids) {
   if (!box || !raids.length) return;
   let view = "raid";
   try {
-    view = localStorage.getItem(LOOT_VIEW_KEY) === "slot" ? "slot" : "raid";
+    view = ["slot", "boss"].includes(localStorage.getItem(LOOT_VIEW_KEY)) ? localStorage.getItem(LOOT_VIEW_KEY) : "raid";
   } catch {
     // Storage blocked: start on the raid view.
   }
@@ -366,6 +374,10 @@ function applyLoot(raids) {
       renderLoot(raids, view);
     })
   );
+  // By boss only once some loot comes from a boss the bot knows.
+  const hasBosses = raids.some((r) => r.items.some((i) => i.boss));
+  document.querySelector("[data-loot-view=boss]").hidden = !hasBosses;
+  if (view === "boss" && !hasBosses) view = "raid";
   renderLoot(raids, view);
   box.hidden = false;
 }

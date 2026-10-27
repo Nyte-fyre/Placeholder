@@ -92,6 +92,20 @@
           <div data-my-perf></div>
           <div data-my-gear></div>
 
+          <h2 class="members-h2">Wishlist</h2>
+          <p class="hint">The items you want, most wanted first. Officers see this when loot drops, so keep it current.</p>
+          <ol class="wish-list" data-wish-list></ol>
+          <p class="empty" data-wish-empty hidden>Nothing on your wishlist yet. Find items below.</p>
+          <div class="item-finder" data-wish-finder>
+            <div class="filters">
+              <input type="search" placeholder="Search items" aria-label="Search items" data-wish-search />
+              <select aria-label="Raid or boss" data-wish-boss></select>
+              <label class="check"><input type="checkbox" data-wish-usable checked /> Only items I can use</label>
+            </div>
+            <ul class="item-results" data-wish-results></ul>
+          </div>
+          <p class="form-status" data-wish-status></p>
+
           <h2 class="members-h2">Attendance</h2>
           <div class="table-scroll">
             <table class="data-table" data-my-history>
@@ -109,6 +123,20 @@
         </section>
 
         <section class="tab-panel" data-panel="raids" hidden>
+          <details class="import-box" data-import>
+            <summary>Add a raid's log or loot</summary>
+            <p class="hint">Same as <code>/raidlog wcl</code> and <code>/raidlog loot</code> in Discord. Leave the date empty for the latest raid (for a log, the night it was recorded).</p>
+            <form class="import-form" data-import-form>
+              <label>Raid night <input type="date" name="date" /></label>
+              <label>Warcraft Logs link <input type="url" name="url" placeholder="https://fresh.warcraftlogs.com/reports/…" /></label>
+              <label>Gargul export <textarea name="text" rows="5" placeholder="Gargul > Export > TMB format, then paste everything"></textarea></label>
+              <div class="import-actions">
+                <button class="btn btn-primary btn-small" type="submit" name="action" value="wcl">Read log</button>
+                <button class="btn btn-ghost btn-small" type="submit" name="action" value="loot">Add loot</button>
+                <span class="form-status" data-import-status></span>
+              </div>
+            </form>
+          </details>
           <p class="hint">Every logged raid, newest first. Open one to see who was there, the loot and parses.</p>
           <div data-raids></div>
           <p class="empty" data-raids-empty hidden>No raids logged yet.</p>
@@ -137,6 +165,16 @@
         </section>
 
         <section class="tab-panel" data-panel="loot" hidden>
+          <div class="lookup">
+            <h2 class="members-h2">Who could use this?</h2>
+            <p class="hint">Pick an item to see everyone who wants it or can use it, with their loot fairness numbers and what they wear in that slot now.</p>
+            <div class="filters">
+              <input type="search" placeholder="Item name" aria-label="Item name" data-lookup-search />
+            </div>
+            <ul class="item-results" data-lookup-results></ul>
+            <div data-lookup-view></div>
+          </div>
+          <h2 class="members-h2">Loot per player</h2>
           <p class="hint">
             Loot per player across every logged raid. <strong>Per raid</strong> is main-spec items per raid attended; lower means
             they've had less. Click a name for their full history and parse graph.

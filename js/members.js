@@ -477,6 +477,7 @@ function raidCard(raid, open) {
       const winner = el("span", "loot-meta", " → ");
       winner.append(personLink(i.owner, i.character));
       li.append(itemLink(i), winner);
+      if (sourceLabel(catalog[i.itemId])) li.append(el("span", "loot-meta", ` · ${sourceLabel(catalog[i.itemId])}`));
       li.append(specTag(i));
       ul.append(li);
     }
@@ -648,9 +649,322 @@ document.querySelectorAll("[data-loot-table] th[data-sort]").forEach((th) => {
 });
 ["[data-loot-search]", "[data-loot-role]", "[data-loot-class]"].forEach((s) => $(s).addEventListener("input", renderLoot));
 
+// ---- items: catalog, who can use what ----
+
+let catalog = {};
+let tables = [];
+let me = null;
+
+const ALL_CLASSES = ["Warrior", "Rogue", "Hunter", "Mage", "Warlock", "Priest", "Shaman", "Druid"];
+const ARMOR_OK = {
+  Cloth: ALL_CLASSES,
+  Leather: ["Warrior", "Rogue", "Hunter", "Shaman", "Druid"],
+  Mail: ["Warrior", "Hunter", "Shaman"],
+  Plate: ["Warrior"],
+  Shield: ["Warrior", "Shaman"],
+};
+// [one-handed, two-handed] users per weapon type (Classic proficiencies, no paladins on Horde).
+const WEAPON_OK = {
+  Sword: [["Warrior", "Rogue", "Hunter", "Mage", "Warlock"], ["Warrior", "Hunter"]],
+  Axe: [["Warrior", "Hunter", "Shaman"], ["Warrior", "Hunter", "Shaman"]],
+  Mace: [["Warrior", "Rogue", "Priest", "Shaman", "Druid"], ["Warrior", "Shaman", "Druid"]],
+  Dagger: [["Warrior", "Rogue", "Hunter", "Mage", "Warlock", "Priest", "Shaman", "Druid"]],
+  Staff: [[], ["Warrior", "Hunter", "Mage", "Warlock", "Priest", "Shaman", "Druid"]],
+  Polearm: [[], ["Warrior", "Hunter"]],
+  "Fist Weapon": [["Warrior", "Rogue", "Hunter", "Shaman", "Druid"]],
+  Bow: [["Warrior", "Rogue", "Hunter"]],
+  Gun: [["Warrior", "Rogue", "Hunter"]],
+  Crossbow: [["Warrior", "Rogue", "Hunter"]],
+  Thrown: [["Warrior", "Rogue"]],
+  Wand: [["Mage", "Warlock", "Priest"]],
+  Idol: [["Druid"]],
+  Totem: [["Shaman"]],
+};
+
+function canUse(item, cls) {
+  if (!item || !cls) return false;
+  if (item.c?.length && !item.c.includes(cls)) return false;
+  if (ARMOR_OK[item.t]) return ARMOR_OK[item.t].includes(cls);
+  const weapon = WEAPON_OK[item.t];
+  if (weapon) return (item.h === "Two-Hand" ? weapon[1] || weapon[0] : weapon[0]).includes(cls);
+  return true;
+}
+
+// Which equipped slots an item would replace.
+const GEAR_SLOT_OF = {
+  Head: [0], Neck: [1], Shoulder: [2], Back: [14], Chest: [4], Wrist: [8], Hands: [9], Waist: [5], Legs: [6], Feet: [7],
+  Finger: [10, 11], Trinket: [12, 13], "One-Hand": [15, 16], "Main Hand": [15], "Two-Hand": [15], "Off Hand": [16], "Held In Off-hand": [16],
+  Ranged: [17], Thrown: [17], Relic: [17],
+};
+
+const sourceLabel = (item) => {
+  const src = item?.src || [];
+  if (!src.length) return "";
+  return src.length === 1 ? src[0].boss : `${src[0].zone}, ${src.length} bosses`;
+};
+const itemMeta = (item) => [item?.h || item?.s, item?.t, sourceLabel(item)].filter(Boolean).join(" · ");
+const catalogLink = (id) => itemLink({ itemId: id, name: catalog[id]?.n || `Item ${id}`, quality: catalog[id]?.q || 0 });
+
+// Items matching a search (or one boss / raid from the picker), best first.
+function findItems(query, scope, filter) {
+  const q = query.trim().toLowerCase();
+  let ids = Object.keys(catalog).map(Number);
+  if (scope) {
+    const [zone, boss] = scope.split("|");
+    ids = ids.filter((id) => (catalog[id].src || []).some((s) => s.zone === zone && (!boss || s.boss === boss)));
+  }
+  if (q) ids = ids.filter((id) => catalog[id].n.toLowerCase().includes(q));
+  if (filter) ids = ids.filter((id) => filter(catalog[id]));
+  return ids.sort((a, b) => (catalog[b].q - catalog[a].q) || catalog[a].n.localeCompare(catalog[b].n)).slice(0, 40);
+}
+
+// ---- wishlist (everyone) ----
+
+let wishlist = [];
+
+function renderWishlist() {
+  const won = new Set((me?.loot || []).map((i) => i.itemId));
+  const rows = wishlist.map((id, i) => {
+    const li = el("li");
+    const main = el("div", "wish-item");
+    main.append(catalogLink(id), el("span", "loot-meta", ` ${itemMeta(catalog[id])}`));
+    if (won.has(id)) main.append(el("span", "loot-tag tag-ms", "Received"));
+    const tools = el("div", "wish-tools");
+    const tool = (label, title, onClick, disabled) => {
+      const b = el("button", "icon-btn", label);
+      b.type = "button";
+      b.title = title;
+      b.setAttribute("aria-label", title);
+      b.disabled = Boolean(disabled);
+      b.addEventListener("click", onClick);
+      return b;
+    };
+    tools.append(
+      tool("↑", "Move up", () => moveWish(i, -1), i === 0),
+      tool("↓", "Move down", () => moveWish(i, 1), i === wishlist.length - 1),
+      tool("✕", "Remove", () => saveWishlist(wishlist.filter((x) => x !== id)))
+    );
+    li.append(main, tools);
+    return li;
+  });
+  $("[data-wish-list]").replaceChildren(...rows);
+  $("[data-wish-empty]").hidden = Boolean(rows.length);
+  renderWishResults();
+  setTimeout(refreshItemLinks);
+}
+
+function moveWish(i, step) {
+  const next = [...wishlist];
+  [next[i], next[i + step]] = [next[i + step], next[i]];
+  saveWishlist(next);
+}
+
+let wishSaving = Promise.resolve();
+function saveWishlist(next) {
+  wishlist = next;
+  renderWishlist();
+  const status = $("[data-wish-status]");
+  status.className = "form-status";
+  status.textContent = "Saving…";
+  wishSaving = wishSaving.then(async () => {
+    try {
+      const res = await fetch(new URL("/members", cfg.botUrl), {
+        method: "POST",
+        headers: { Authorization: `Bearer ${readPass()}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "wishlist", items: wishlist }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401) return showSignIn("Your sign-in expired. Please sign in again.");
+      if (!res.ok) throw new Error(data.error || "Couldn't save.");
+      status.className = "form-status ok";
+      status.textContent = "Saved.";
+    } catch (err) {
+      status.className = "form-status err";
+      status.textContent = err.message;
+    }
+  });
+}
+
+function scopeOptions(select, firstLabel) {
+  const options = [el("option", "", firstLabel)];
+  options[0].value = "";
+  for (const z of tables) {
+    if (!z.bosses.length) continue;
+    const group = document.createElement("optgroup");
+    group.label = z.zone;
+    const all = el("option", "", `All of ${z.zone}`);
+    all.value = `${z.zone}|`;
+    group.append(all, ...z.bosses.map((b) => Object.assign(el("option", "", b.name), { value: `${z.zone}|${b.name}` })));
+    options.push(group);
+  }
+  select.replaceChildren(...options);
+}
+
+function renderWishResults() {
+  const query = $("[data-wish-search]").value;
+  const scope = $("[data-wish-boss]").value;
+  const list = $("[data-wish-results]");
+  if (!query.trim() && !scope) {
+    list.replaceChildren(el("li", "empty", "Search for an item, or pick a raid or boss."));
+    return;
+  }
+  const myClass = me?.spec?.cls;
+  const onlyUsable = $("[data-wish-usable]").checked && myClass;
+  const ids = findItems(query, scope, onlyUsable ? (item) => canUse(item, myClass) : null);
+  list.replaceChildren(
+    ...(ids.length
+      ? ids.map((id) => {
+          const li = el("li");
+          li.append(catalogLink(id), el("span", "loot-meta", ` ${itemMeta(catalog[id])}`));
+          const add = el("button", "btn btn-ghost btn-small", wishlist.includes(id) ? "On your list" : "Add");
+          add.type = "button";
+          add.disabled = wishlist.includes(id);
+          add.addEventListener("click", () => saveWishlist([...wishlist, id]));
+          li.append(add);
+          return li;
+        })
+      : [el("li", "empty", "No items match.")])
+  );
+  setTimeout(refreshItemLinks);
+}
+
+let wishSearchTimer;
+$("[data-wish-search]").addEventListener("input", () => {
+  clearTimeout(wishSearchTimer);
+  wishSearchTimer = setTimeout(renderWishResults, 150);
+});
+$("[data-wish-boss]").addEventListener("change", renderWishResults);
+$("[data-wish-usable]").addEventListener("change", renderWishResults);
+
+// ---- who could use this? (officers) ----
+
+function lookupResults() {
+  const query = $("[data-lookup-search]").value;
+  const list = $("[data-lookup-results]");
+  if (!query.trim()) return list.replaceChildren();
+  const ids = findItems(query, "", null).slice(0, 12);
+  list.replaceChildren(
+    ...ids.map((id) => {
+      const li = el("li");
+      const pickButton = el("button", "item-pick", catalog[id].n);
+      pickButton.type = "button";
+      pickButton.className = `item-pick q${catalog[id].q || 0}`;
+      pickButton.addEventListener("click", () => {
+        list.replaceChildren();
+        $("[data-lookup-search]").value = catalog[id].n;
+        renderLookup(id);
+      });
+      li.append(pickButton, el("span", "loot-meta", ` ${itemMeta(catalog[id])}`));
+      return li;
+    })
+  );
+}
+
+function renderLookup(id) {
+  const item = catalog[id];
+  const view = $("[data-lookup-view]");
+  const slots = GEAR_SLOT_OF[item.h] || [];
+  const rows = roster
+    .map((m) => {
+      const rank = (m.wishlist || []).indexOf(id);
+      const has = (m.lootList || []).some((i) => i.itemId === id) || (m.gear || []).some((g) => g.items.some((i) => i.id === id));
+      const usable = canUse(item, m.spec?.cls);
+      return { m, rank: rank === -1 ? null : rank + 1, has, usable };
+    })
+    .filter((r) => r.rank || r.usable);
+  rows.sort(
+    (a, b) =>
+      Number(a.has) - Number(b.has) ||
+      (a.rank ?? 99) - (b.rank ?? 99) ||
+      (perRaid(a.m) ?? 0) - (perRaid(b.m) ?? 0) ||
+      (b.m.recent.percent ?? -1) - (a.m.recent.percent ?? -1)
+  );
+
+  const head = el("div", "lookup-head");
+  head.append(catalogLink(id), el("span", "loot-meta", ` ${itemMeta(item)}${item.l ? ` · item level ${item.l}` : ""}`));
+  const wrap = el("div", "table-scroll");
+  const table = el("table", "data-table");
+  table.append(el("thead"), el("tbody"));
+  const hr = el("tr");
+  ["Member", "Spec", "Wishlist", "Now wearing", "Attendance", "Per raid", "Avg parse"].forEach((h, i) => hr.append(el("th", i >= 4 ? "num" : "", h)));
+  table.tHead.append(hr);
+  for (const { m, rank, has } of rows) {
+    const tr = el("tr", has ? "row-muted" : "");
+    const wearing = el("span", "wearing");
+    const worn = (m.gear || [])[0]?.items.filter((g) => slots.includes(g.s)) || [];
+    if (has) wearing.append(el("span", "loot-tag tag-ms", "Has it"));
+    else if (worn.length) worn.forEach((g, i) => wearing.append(...(i ? [" / "] : []), gearItem(g)));
+    else wearing.append("—");
+    const rate = perRaid(m);
+    tr.append(
+      cell(personLink(m.id, m.name)),
+      cell(specLabel(m.spec) || "—", "muted"),
+      cell(rank ? `#${rank}` : "—", rank ? "wish-rank" : "muted"),
+      cell(wearing),
+      cell(pct(m.recent.percent), `num ${attendanceClass(m.recent.percent)}`),
+      cell(rate === null ? "—" : rate.toFixed(2), "num"),
+      cell(parseCell(m.parse), "num")
+    );
+    table.tBodies[0].append(tr);
+  }
+  wrap.append(table);
+  const wanted = rows.filter((r) => r.rank && !r.has).length;
+  view.replaceChildren(
+    head,
+    el("p", "hint", `${wanted} want it on their wishlist · ${rows.filter((r) => r.usable && !r.has).length} can use it. Sorted by wishlist rank, then fewest items per raid.`),
+    rows.length ? wrap : el("p", "empty", "Nobody on the roster can use this.")
+  );
+  setTimeout(refreshItemLinks);
+}
+
+let lookupTimer;
+$("[data-lookup-search]").addEventListener("input", () => {
+  clearTimeout(lookupTimer);
+  lookupTimer = setTimeout(lookupResults, 150);
+});
+
+// ---- add a log or loot from the website (officers) ----
+
+$("[data-import-form]").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const action = event.submitter?.value || "wcl";
+  const status = $("[data-import-status]");
+  const body = { action, date: form.date.value };
+  if (action === "wcl") body.url = form.url.value.trim();
+  else body.text = form.text.value;
+  if (action === "wcl" && !body.url) return Object.assign(status, { className: "form-status err", textContent: "Paste a Warcraft Logs link first." });
+  if (action === "loot" && !body.text.trim()) return Object.assign(status, { className: "form-status err", textContent: "Paste Gargul's export first." });
+  form.querySelectorAll("button").forEach((b) => (b.disabled = true));
+  status.className = "form-status";
+  status.textContent = action === "wcl" ? "Reading the log…" : "Adding loot…";
+  try {
+    const res = await fetch(new URL("/members", cfg.botUrl), {
+      method: "POST",
+      headers: { Authorization: `Bearer ${readPass()}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) return showSignIn("Your sign-in expired. Please sign in again.");
+    if (!res.ok) throw new Error(data.error || "That didn't work.");
+    if (action === "wcl") form.url.value = "";
+    else form.text.value = "";
+    await load();
+    status.className = "form-status ok";
+    status.textContent = data.message;
+  } catch (err) {
+    status.className = "form-status err";
+    status.textContent = err.message;
+  } finally {
+    form.querySelectorAll("button").forEach((b) => (b.disabled = false));
+  }
+});
+
 // ---- tabs ----
 
+let currentTab = "me";
 function selectTab(name) {
+  currentTab = name;
   document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
   document.querySelectorAll("[data-panel]").forEach((p) => (p.hidden = p.dataset.panel !== name));
 }
@@ -667,7 +981,14 @@ function render(data) {
   $("[data-tabs]").hidden = !data.officer;
   roster = data.officer?.roster || [];
   rosterById = Object.fromEntries(roster.map((m) => [m.id, m]));
+  catalog = data.catalog || {};
+  tables = data.tables || [];
+  me = data.me;
+  wishlist = [...(data.me.wishlist || [])];
+  if (!$("[data-wish-boss]").options.length) scopeOptions($("[data-wish-boss]"), "All raids and bosses");
+  $("[data-wish-usable]").closest("label").hidden = !data.me.spec?.cls;
   renderMe(data.me);
+  renderWishlist();
   if (data.officer) {
     renderRaids(data.officer.raids);
     renderRoster();
@@ -676,7 +997,7 @@ function render(data) {
     $("[data-loot-class] option").value = "";
     renderLoot();
   }
-  selectTab("me");
+  selectTab(data.officer ? currentTab : "me");
   setTimeout(refreshItemLinks);
 }
 

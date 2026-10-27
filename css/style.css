@@ -1475,3 +1475,216 @@ html,
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+/* Wishlist, item finder and lookup */
+.wish-list {
+  list-style: decimal;
+  padding-left: 1.6rem;
+  margin: 0.5rem 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.wish-list li::marker {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.wish-list li > * {
+  vertical-align: middle;
+}
+
+.wish-list li {
+  padding: 0.15rem 0;
+}
+
+.wish-item {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+}
+
+.wish-item a,
+.item-results a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.wish-tools {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.icon-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  color: var(--steel);
+  font: inherit;
+  font-size: 0.85rem;
+  line-height: 1;
+  width: 1.9rem;
+  height: 1.9rem;
+  cursor: pointer;
+}
+
+.icon-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.item-finder {
+  margin-top: 1rem;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.item-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 24rem;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+}
+
+.item-results:empty {
+  display: none;
+}
+
+.item-results li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid rgba(208, 32, 32, 0.12);
+}
+
+.item-results li:last-child {
+  border-bottom: 0;
+}
+
+.item-results li .btn {
+  margin-left: auto;
+}
+
+.item-pick {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.item-pick:hover {
+  text-decoration: underline;
+}
+
+.lookup {
+  margin-bottom: 2rem;
+}
+
+.lookup-head {
+  margin: 1rem 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.lookup-head a {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.wish-rank {
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.data-table tr.row-muted td {
+  opacity: 0.5;
+}
+
+.wearing a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Officer import box */
+.import-box {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  margin-bottom: 1.25rem;
+}
+
+.import-box summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.import-box[open] summary {
+  border-bottom: 1px solid rgba(208, 32, 32, 0.14);
+}
+
+.import-box .hint {
+  margin: 0.75rem 1rem 0;
+}
+
+.import-form {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem 1rem;
+}
+
+.import-form label {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.import-form input,
+.import-form textarea {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  max-width: 100%;
+}
+
+.import-form input[type="date"] {
+  width: 12rem;
+  color-scheme: dark;
+}
+
+.import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.import-actions .form-status {
+  margin: 0;
+}
+
+.filters input[type="checkbox"] {
+  width: auto;
+  padding: 0;
+  accent-color: var(--accent);
+}
